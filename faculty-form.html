@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Notice Form</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0078d4;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #0078d4;
+        }
+        .checkbox-group {
+            padding: 10px 0;
+        }
+        .checkbox-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+        .student-section {
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fafafa;
+        }
+        .student-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+        .student-row input {
+            flex: 1;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #0078d4;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #106ebe;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            margin-left: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 11px;
+            min-width: 60px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e1e1;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            display: none;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #0078d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Travel for Student Activities</h1>
+        
+        <div class="instructions">
+            <p><strong>Instructions:</strong> This form must be completed by the employee organizing travel for an academic or University-supported activity. At least two weeks prior to overnight travel, submit this form to the area vice president, or designee.</p>
+        </div>
+
+        <div class="message" id="messageDiv"></div>
+        <div class="loading" id="loadingDiv">
+            <p>Submitting travel notice and sending invitations...</p>
+        </div>
+
+        <form id="travelForm">
+            <div class="form-group">
+                <label for="employeeOrganizing">Employee organizing travel arrangements <span class="required">*</span></label>
+                <input type="text" id="employeeOrganizing" name="employeeOrganizing" required>
+            </div>
+
+            <div class="form-group">
+                <label for="employeeContact">Employee's contact information during travel <span class="required">*</span></label>
+                <input type="text" id="employeeContact" name="employeeContact" placeholder="Email and phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="travelType">Travel Type <span class="required">*</span></label>
+                <select id="travelType" name="travelType" required>
+                    <option value="">Select travel type</option>
+                    <option value="One-Time Travel">One-Time Travel</option>
+                    <option value="Recurring Travel">Recurring Travel</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dateOfTravel">Date of travel <span class="required">*</span></label>
+                <input type="text" id="dateOfTravel" name="dateOfTravel" placeholder="e.g., March 15-20, 2025" required>
+            </div>
+
+            <div class="form-group">
+                <label for="travelingTo">Traveling to <span class="required">*</span></label>
+                <input type="text" id="travelingTo" name="travelingTo" placeholder="Destination city and state" required>
+            </div>
+
+            <div class="form-group">
+                <label for="purposeOfTravel">Purpose of travel <span class="required">*</span></label>
+                <textarea id="purposeOfTravel" name="purposeOfTravel" rows="3" placeholder="Describe the purpose and nature of this travel" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Mode of transportation (mark all that apply) <span class="required">*</span></label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="transportation" value="University-owned or leased vehicle"> 
+                        University-owned or leased vehicle
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="transportation" value="Commercial bus/mini-bus"> 
+                        Commercial bus/mini-bus
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="transportation" value="Private vehicle(s)"> 
+                        Private vehicle(s)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="transportation" value="Other"> 
+                        Other:
+                        <input type="text" id="transportationOther" name="transportationOther" placeholder="Specify other transportation" style="margin-left: 10px; width: 200px;">
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lodgingInfo">Lodging information</label>
+                <textarea id="lodgingInfo" name="lodgingInfo" rows="3" placeholder="Name of facility, address, phone number, and check-in/check-out dates"></textarea>
+            </div>
+
+            <div class="student-section">
+                <h3>Student Travelers</h3>
+                <div id="studentsContainer">
+                    <div class="student-row">
+                        <div style="flex: 1;">
+                            <label>Student Name</label>
+                            <input type="text" class="student-name" placeholder="Enter student name" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Student Email</label>
+                            <input type="email" class="student-email" placeholder="Enter student email" required>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger" onclick="removeStudent(this)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addStudent()">Add Another Student</button>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit Travel Notice</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THESE VALUES
+        const SHAREPOINT_SITE_URL = 'https://muskingum.sharepoint.com/sites/ACOPS_AssociateProvost';
+        const APP_URL = 'https://your-form-domain.com'; // For student waiver deep links
+
+        function addStudent() {
+            const container = document.getElementById('studentsContainer');
+            const studentRow = document.createElement('div');
+            studentRow.className = 'student-row';
+            studentRow.innerHTML = `
+                <div style="flex: 1;">
+                    <label>Student Name</label>
+                    <input type="text" class="student-name" placeholder="Enter student name" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Student Email</label>
+                    <input type="email" class="student-email" placeholder="Enter student email" required>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" onclick="removeStudent(this)">Remove</button>
+                </div>
+            `;
+            container.appendChild(studentRow);
+        }
+
+        function removeStudent(button) {
+            const studentRows = document.querySelectorAll('.student-row');
+            if (studentRows.length > 1) {
+                button.closest('.student-row').remove();
+            } else {
+                showMessage('error', 'At least one student is required.');
+            }
+        }
+
+        function collectStudents() {
+            const students = [];
+            document.querySelectorAll('.student-row').forEach(row => {
+                const name = row.querySelector('.student-name').value.trim();
+                const email = row.querySelector('.student-email').value.trim();
+                if (name && email) {
+                    students.push({ name, email });
+                }
+            });
+            return students;
+        }
+
+        function collectTransportationModes() {
+            const checkboxes = document.querySelectorAll('input[name="transportation"]:checked');
+            const modes = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.value === 'Other') {
+                    const otherText = document.getElementById('transportationOther').value.trim();
+                    if (otherText) {
+                        modes.push(`Other: ${otherText}`);
+                    }
+                } else {
+                    modes.push(checkbox.value);
+                }
+            });
+            return modes.join('; ');
+        }
+
+        function validateTransportation() {
+            const checkboxes = document.querySelectorAll('input[name="transportation"]:checked');
+            if (checkboxes.length === 0) {
+                showMessage('error', 'Please select at least one mode of transportation.');
+                return false;
+            }
+            return true;
+        }
+
+        function generateNoticeId() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            return `TN-${timestamp}-${random}`;
+        }
+
+        function generateTrackingCode(noticeId, index) {
+            return `${noticeId}-${String(index + 1).padStart(3, '0')}`;
+        }
+
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('messageDiv');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
+            document.querySelector('button[type="submit"]').disabled = show;
+        }
+
+        async function getFormDigest() {
+            try {
+                const response = await axios.post(
+                    `${SHAREPOINT_SITE_URL}/_api/contextinfo`,
+                    {},
+                    {
+                        headers: {
+                            'Accept': 'application/json;odata=verbose',
+                            'Content-Type': 'application/json;odata=verbose'
+                        }
+                    }
+                );
+                return response.data.d.GetContextWebInformation.FormDigestValue;
+            } catch (error) {
+                throw new Error('Failed to get SharePoint form digest. Please check your SharePoint site URL.');
+            }
+        }
+
+        async function createTravelNotice(formDigest, noticeData) {
+            const response = await axios.post(
+                `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Notices')/items`,
+                {
+                    __metadata: { type: 'SP.Data.Travel_x0020_NoticesListItem' },
+                    NoticeId: noticeData.noticeId,
+                    EmployeeOrganizingTravel: noticeData.employeeOrganizing,
+                    EmployeeContactInfo: noticeData.employeeContact,
+                    TravelType: noticeData.travelType,
+                    DateOfTravel: noticeData.dateOfTravel,
+                    TravelingTo: noticeData.travelingTo,
+                    PurposeOfTravel: noticeData.purposeOfTravel,
+                    TransportationMode: noticeData.transportationMode,
+                    TransportationOther: noticeData.transportationOther,
+                    LodgingInformation: noticeData.lodgingInfo,
+                    Status: 'Active'
+                },
+                {
+                    headers: {
+                        'Accept': 'application/json;odata=verbose',
+                        'Content-Type': 'application/json;odata=verbose',
+                        'X-RequestDigest': formDigest
+                    }
+                }
+            );
+            return response.data;
+        }
+
+        async function createStudentWaivers(formDigest, noticeId, students) {
+            const promises = students.map(async (student, index) => {
+                const trackingCode = generateTrackingCode(noticeId, index);
+                return axios.post(
+                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Waiver Tracking')/items`,
+                    {
+                        __metadata: { type: 'SP.Data.Travel_x0020_Waiver_x0020_TrackingListItem' },
+                        NoticeId: noticeId,
+                        StudentName: student.name,
+                        StudentEmail: student.email,
+                        TrackingCode: trackingCode,
+                        Status: 'Invited',
+                        InvitationSentAt: new Date().toISOString()
+                    },
+                    {
+                        headers: {
+                            'Accept': 'application/json;odata=verbose',
+                            'Content-Type': 'application/json;odata=verbose',
+                            'X-RequestDigest': formDigest
+                        }
+                    }
+                );
+            });
+
+            return Promise.all(promises);
+        }
+
+        document.getElementById('travelForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateTransportation()) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const formData = new FormData(e.target);
+                const students = collectStudents();
+                
+                if (students.length === 0) {
+                    throw new Error('Please add at least one student.');
+                }
+
+                const noticeId = generateNoticeId();
+                const transportationModes = collectTransportationModes();
+                
+                const noticeData = {
+                    noticeId,
+                    employeeOrganizing: formData.get('employeeOrganizing'),
+                    employeeContact: formData.get('employeeContact'),
+                    travelType: formData.get('travelType'),
+                    dateOfTravel: formData.get('dateOfTravel'),
+                    travelingTo: formData.get('travelingTo'),
+                    purposeOfTravel: formData.get('purposeOfTravel'),
+                    transportationMode: transportationModes,
+                    transportationOther: formData.get('transportationOther') || '',
+                    lodgingInfo: formData.get('lodgingInfo') || ''
+                };
+
+                // Get SharePoint form digest
+                const formDigest = await getFormDigest();
+
+                // Create travel notice
+                await createTravelNotice(formDigest, noticeData);
+
+                // Create student waiver records
+                await createStudentWaivers(formDigest, noticeId, students);
+
+                showMessage('success', `Travel notice created successfully! Notice ID: ${noticeId}. Student invitation emails will be sent automatically.`);
+                
+                // Reset form
+                e.target.reset();
+                document.getElementById('studentsContainer').innerHTML = `
+                    <div class="student-row">
+                        <div style="flex: 1;">
+                            <label>Student Name</label>
+                            <input type="text" class="student-name" placeholder="Enter student name" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Student Email</label>
+                            <input type="email" class="student-email" placeholder="Enter student email" required>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger" onclick="removeStudent(this)">Remove</button>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', `Error: ${error.message || 'Please check your network connection and try again.'}`);
+            } finally {
+                showLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

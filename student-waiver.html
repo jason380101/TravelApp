@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Waiver Completion</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0078d4;
+            text-align: center;
+        }
+        .trip-info {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #0078d4;
+        }
+        .additional-info-section {
+            background-color: #e8f4f8;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #0078d4;
+        }
+        .additional-info-section h4 {
+            margin-top: 0;
+            color: #0078d4;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #0078d4;
+        }
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .waiver-content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+        }
+        .agreement-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .checkbox-container input[type="checkbox"] {
+            margin-top: 5px;
+            transform: scale(1.2);
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #0078d4;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #106ebe;
+        }
+        .btn-primary:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Travel Waiver Completion</h1>
+        
+        <div id="tripInfo" class="trip-info" style="display: none;">
+            <h3 id="tripName"></h3>
+            <p><strong>Dates:</strong> <span id="tripDates"></span></p>
+            <p><strong>Faculty Organizer:</strong> <span id="facultyName"></span></p>
+            <p><strong>Student:</strong> <span id="studentName"></span></p>
+        </div>
+
+        <div class="message" id="messageDiv" style="display: none;"></div>
+        <div class="loading" id="loadingDiv">
+            <p>Loading waiver information...</p>
+        </div>
+
+        <div id="waiverForm" style="display: none;">
+            <div class="waiver-content">
+                <h4>Travel Waiver and Release Form</h4>
+                <p>By participating in this University-sponsored travel activity, I understand and agree to the following terms:</p>
+                
+                <p><strong>1. Assumption of Risk:</strong> I acknowledge that travel activities involve inherent risks, including but not limited to transportation accidents, illness, injury, and other unforeseen circumstances.</p>
+                
+                <p><strong>2. Release of Liability:</strong> I hereby release and hold harmless the University, its employees, agents, and representatives from any and all claims, demands, or actions arising from my participation in this travel activity.</p>
+                
+                <p><strong>3. Medical Treatment:</strong> I authorize University representatives to obtain necessary medical treatment for me in case of emergency.</p>
+                
+                <p><strong>4. Compliance with Policies:</strong> I agree to comply with all University policies, local laws, and instructions from faculty leaders during the travel period.</p>
+                
+                <p><strong>5. COVID-19 Acknowledgment:</strong> I understand that travel during the COVID-19 pandemic involves additional health risks, and I agree to follow all applicable health and safety protocols.</p>
+                
+                <p><strong>6. Insurance:</strong> I understand that I am responsible for ensuring I have appropriate health insurance coverage during travel.</p>
+                
+                <p><strong>7. Emergency Contact:</strong> I have provided accurate emergency contact information to the faculty organizer.</p>
+            </div>
+
+            <div class="additional-info-section">
+                <h4>Additional Information Required</h4>
+                
+                <div class="form-group">
+                    <label for="emergencyContact">Emergency Contact Name <span class="required">*</span></label>
+                    <input type="text" id="emergencyContact" placeholder="Full name of emergency contact" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="relationship">Relationship to Emergency Contact <span class="required">*</span></label>
+                    <input type="text" id="relationship" placeholder="e.g., Parent, Spouse, Guardian" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Information to Disclose</label>
+                    <textarea id="additionalInfo" rows="4" placeholder="Please disclose any medical conditions, dietary restrictions, accessibility needs, or other information the faculty organizer should be aware of (optional)"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="studentSignature">Digital Signature <span class="required">*</span></label>
+                    <input type="text" id="studentSignature" placeholder="Type your full name as your digital signature" required>
+                    <small style="color: #666; font-style: italic;">By typing your name above, you are providing your legal digital signature</small>
+                </div>
+            </div>
+
+            <div class="agreement-section">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="agreeCheckbox" required>
+                    <label for="agreeCheckbox">
+                        <strong>I have read, understood, and agree to all terms and conditions outlined in this Travel Waiver and Release Form.</strong>
+                        I understand that this agreement is binding and that I am voluntarily assuming all risks associated with this travel activity.
+                    </label>
+                </div>
+            </div>
+
+            <button id="submitBtn" class="btn btn-primary" disabled onclick="submitWaiver()">
+                Complete Travel Waiver
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THESE VALUES
+        const SHAREPOINT_SITE_URL = 'https://muskingum.sharepoint.com/sites/ACOPS_AssociateProvost/Lists/Travel%20Waiver%20Tracking/AllItems.aspx';
+
+        // Get URL parameters
+        function getUrlParameters() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                noticeId: params.get('noticeId'),
+                trackingCode: params.get('tracking'),
+                email: params.get('email')
+            };
+        }
+
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('messageDiv');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
+        }
+
+        async function loadWaiverInfo() {
+            const params = getUrlParameters();
+            
+            if (!params.noticeId || !params.trackingCode || !params.email) {
+                showMessage('error', 'Invalid waiver link. Please contact your faculty organizer.');
+                return;
+            }
+
+            try {
+                showLoading(true);
+
+                // Get student waiver record
+                const waiverResponse = await axios.get(
+                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Waiver Tracking')/items?$filter=TrackingCode eq '${params.trackingCode}' and StudentEmail eq '${params.email}'`,
+                    {
+                        headers: {
+                            'Accept': 'application/json;odata=verbose'
+                        }
+                    }
+                );
+
+                if (waiverResponse.data.d.results.length === 0) {
+                    showMessage('error', 'Waiver record not found. Please contact your faculty organizer.');
+                    return;
+                }
+
+                const waiverRecord = waiverResponse.data.d.results[0];
+
+                if (waiverRecord.Status === 'Completed') {
+                    showMessage('success', 'You have already completed this travel waiver. Thank you!');
+                    return;
+                }
+
+                // Get travel notice details
+                const noticeResponse = await axios.get(
+                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Notices')/items?$filter=NoticeId eq '${params.noticeId}'`,
+                    {
+                        headers: {
+                            'Accept': 'application/json;odata=verbose'
+                        }
+                    }
+                );
+
+                if (noticeResponse.data.d.results.length === 0) {
+                    showMessage('error', 'Travel notice not found. Please contact your faculty organizer.');
+                    return;
+                }
+
+                const noticeRecord = noticeResponse.data.d.results[0];
+
+                // Populate trip information
+                document.getElementById('tripName').textContent = `${noticeRecord.TravelingTo} - ${noticeRecord.PurposeOfTravel}`;
+                document.getElementById('tripDates').textContent = noticeRecord.DateOfTravel;
+                document.getElementById('facultyName').textContent = noticeRecord.EmployeeOrganizingTravel;
+                document.getElementById('studentName').textContent = waiverRecord.StudentName;
+
+                // Store IDs for submission
+                window.waiverData = {
+                    waiverItemId: waiverRecord.Id,
+                    noticeId: params.noticeId,
+                    trackingCode: params.trackingCode,
+                    studentEmail: params.email
+                };
+
+                // Show the form
+                document.getElementById('tripInfo').style.display = 'block';
+                document.getElementById('waiverForm').style.display = 'block';
+                showLoading(false);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error loading waiver information. Please try again or contact your faculty organizer.');
+                showLoading(false);
+            }
+        }
+
+        async function submitWaiver() {
+            if (!document.getElementById('agreeCheckbox').checked) {
+                showMessage('error', 'Please check the agreement box to complete your waiver.');
+                return;
+            }
+
+            // Validate required fields
+            const emergencyContact = document.getElementById('emergencyContact').value.trim();
+            const relationship = document.getElementById('relationship').value.trim();
+            const studentSignature = document.getElementById('studentSignature').value.trim();
+
+            if (!emergencyContact || !relationship || !studentSignature) {
+                showMessage('error', 'Please fill in all required fields (Emergency Contact, Relationship, and Digital Signature).');
+                return;
+            }
+
+            try {
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').textContent = 'Submitting...';
+
+                // Get form digest
+                const digestResponse = await axios.post(
+                    `${SHAREPOINT_SITE_URL}/_api/contextinfo`,
+                    {},
+                    {
+                        headers: {
+                            'Accept': 'application/json;odata=verbose',
+                            'Content-Type': 'application/json;odata=verbose'
+                        }
+                    }
+                );
+
+                const formDigest = digestResponse.data.d.GetContextWebInformation.FormDigestValue;
+
+                // Collect all form data
+                const additionalInfo = document.getElementById('additionalInfo').value.trim();
+
+                // Update waiver status with all the new information
+                await axios.post(
+                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Waiver Tracking')/items(${window.waiverData.waiverItemId})`,
+                    {
+                        __metadata: { 
+                            type: 'SP.Data.Travel_x0020_Waiver_x0020_TrackingListItem' 
+                        },
+                        Status: 'Completed',
+                        ResponseReceivedAt: new Date().toISOString(),
+                        StudentSignature: studentSignature,
+                        EmergencyContact: emergencyContact,
+                        Relationship: relationship,
+                        AdditionalInformationtoDisclose: additionalInfo || ''
+                    },
+                    {
+                        headers: {
+                            'Accept': 'application/json;odata=verbose',
+                            'Content-Type': 'application/json;odata=verbose',
+                            'X-RequestDigest': formDigest,
+                            'X-HTTP-Method': 'MERGE',
+                            'IF-MATCH': '*'
+                        }
+                    }
+                );
+
+                showMessage('success', 'Travel waiver completed successfully! Thank you for your participation.');
+                document.getElementById('waiverForm').style.display = 'none';
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error submitting waiver. Please try again or contact your faculty organizer.');
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Complete Travel Waiver';
+            }
+        }
+
+        // Enable/disable submit button based on checkbox
+        document.getElementById('agreeCheckbox').addEventListener('change', function() {
+            document.getElementById('submitBtn').disabled = !this.checked;
+        });
+
+        // Load waiver info when page loads
+        window.addEventListener('load', loadWaiverInfo);
+    </script>
+</body>
+</html>
