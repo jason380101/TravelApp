@@ -220,7 +220,7 @@
 
     <script>
         // Configuration - UPDATE THESE VALUES
-        const SHAREPOINT_SITE_URL = 'https://muskingum.sharepoint.com/sites/ACOPS_AssociateProvost/Lists/Travel%20Waiver%20Tracking/AllItems.aspx';
+        const WAIVER_FLOW_URL = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ce9daee0c15840e5aeccd8a68840572d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=JiEWEQRESdSq2mPHhb3o5cd59Z_F25iVZzHwIhK7ids';
 
         // Get URL parameters
         function getUrlParameters() {
@@ -254,58 +254,19 @@
             try {
                 showLoading(true);
 
-                // Get student waiver record
-                const waiverResponse = await axios.get(
-                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Waiver Tracking')/items?$filter=TrackingCode eq '${params.trackingCode}' and StudentEmail eq '${params.email}'`,
-                    {
-                        headers: {
-                            'Accept': 'application/json;odata=verbose'
-                        }
-                    }
-                );
-
-                if (waiverResponse.data.d.results.length === 0) {
-                    showMessage('error', 'Waiver record not found. Please contact your faculty organizer.');
-                    return;
-                }
-
-                const waiverRecord = waiverResponse.data.d.results[0];
-
-                if (waiverRecord.Status === 'Completed') {
-                    showMessage('success', 'You have already completed this travel waiver. Thank you!');
-                    return;
-                }
-
-                // Get travel notice details
-                const noticeResponse = await axios.get(
-                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Notices')/items?$filter=NoticeId eq '${params.noticeId}'`,
-                    {
-                        headers: {
-                            'Accept': 'application/json;odata=verbose'
-                        }
-                    }
-                );
-
-                if (noticeResponse.data.d.results.length === 0) {
-                    showMessage('error', 'Travel notice not found. Please contact your faculty organizer.');
-                    return;
-                }
-
-                const noticeRecord = noticeResponse.data.d.results[0];
-
-                // Populate trip information
-                document.getElementById('tripName').textContent = `${noticeRecord.TravelingTo} - ${noticeRecord.PurposeOfTravel}`;
-                document.getElementById('tripDates').textContent = noticeRecord.DateOfTravel;
-                document.getElementById('facultyName').textContent = noticeRecord.EmployeeOrganizingTravel;
-                document.getElementById('studentName').textContent = waiverRecord.StudentName;
-
-                // Store IDs for submission
+                // Store parameters for later use
                 window.waiverData = {
-                    waiverItemId: waiverRecord.Id,
                     noticeId: params.noticeId,
                     trackingCode: params.trackingCode,
                     studentEmail: params.email
                 };
+
+                // Display basic trip info from URL parameters
+                // Note: In production, you might want to fetch full details from SharePoint via another flow
+                document.getElementById('tripName').textContent = `Travel Activity - ${params.noticeId}`;
+                document.getElementById('tripDates').textContent = 'See email for details';
+                document.getElementById('facultyName').textContent = 'See email for details';
+                document.getElementById('studentName').textContent = 'Student';
 
                 // Show the form
                 document.getElementById('tripInfo').style.display = 'block';
@@ -339,50 +300,31 @@
                 document.getElementById('submitBtn').disabled = true;
                 document.getElementById('submitBtn').textContent = 'Submitting...';
 
-                // Get form digest
-                const digestResponse = await axios.post(
-                    `${SHAREPOINT_SITE_URL}/_api/contextinfo`,
-                    {},
-                    {
-                        headers: {
-                            'Accept': 'application/json;odata=verbose',
-                            'Content-Type': 'application/json;odata=verbose'
-                        }
-                    }
-                );
-
-                const formDigest = digestResponse.data.d.GetContextWebInformation.FormDigestValue;
-
-                // Collect all form data
                 const additionalInfo = document.getElementById('additionalInfo').value.trim();
 
-                // Update waiver status with all the new information
-                await axios.post(
-                    `${SHAREPOINT_SITE_URL}/_api/web/lists/GetByTitle('Travel Waiver Tracking')/items(${window.waiverData.waiverItemId})`,
-                    {
-                        __metadata: { 
-                            type: 'SP.Data.Travel_x0020_Waiver_x0020_TrackingListItem' 
-                        },
-                        Status: 'Completed',
-                        ResponseReceivedAt: new Date().toISOString(),
-                        StudentSignature: studentSignature,
-                        EmergencyContact: emergencyContact,
-                        Relationship: relationship,
-                        AdditionalInformationtoDisclose: additionalInfo || ''
-                    },
-                    {
-                        headers: {
-                            'Accept': 'application/json;odata=verbose',
-                            'Content-Type': 'application/json;odata=verbose',
-                            'X-RequestDigest': formDigest,
-                            'X-HTTP-Method': 'MERGE',
-                            'IF-MATCH': '*'
-                        }
-                    }
-                );
+                const payload = {
+                    NoticeId: window.waiverData.noticeId,
+                    TrackingCode: window.waiverData.trackingCode,
+                    StudentEmail: window.waiverData.studentEmail,
+                    EmergencyContact: emergencyContact,
+                    Relationship: relationship,
+                    StudentSignature: studentSignature,
+                    AdditionalInformationtoDisclose: additionalInfo
+                };
 
-                showMessage('success', 'Travel waiver completed successfully! Thank you for your participation.');
-                document.getElementById('waiverForm').style.display = 'none';
+                // Call Power Automate Flow 3
+                const response = await axios.post(WAIVER_FLOW_URL, payload, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.data.success) {
+                    showMessage('success', 'Travel waiver completed successfully! Thank you for your participation.');
+                    document.getElementById('waiverForm').style.display = 'none';
+                } else {
+                    throw new Error(response.data.message || 'Unknown error occurred');
+                }
 
             } catch (error) {
                 console.error('Error:', error);
