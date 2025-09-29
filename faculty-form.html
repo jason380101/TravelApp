@@ -254,7 +254,7 @@
     </div>
 
     <script>
-        // Configuration - UPDATE THESE VALUES
+        // Configuration - UPDATE THIS VALUE WITH YOUR FLOW 1 URL
         const FACULTY_FLOW_URL = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ce9daee0c15840e5aeccd8a68840572d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=JiEWEQRESdSq2mPHhb3o5cd59Z_F25iVZzHwIhK7ids';
 
         function addStudent() {
@@ -292,7 +292,10 @@
                 const name = row.querySelector('.student-name').value.trim();
                 const email = row.querySelector('.student-email').value.trim();
                 if (name && email) {
-                    students.push({ name, email });
+                    students.push({ 
+                        StudentName: name, 
+                        StudentEmail: email 
+                    });
                 }
             });
             return students;
@@ -329,10 +332,6 @@
             return `TN-${timestamp}-${random}`;
         }
 
-        function generateTrackingCode(noticeId, index) {
-            return `${noticeId}-${String(index + 1).padStart(3, '0')}`;
-        }
-
         function showMessage(type, text) {
             const messageDiv = document.getElementById('messageDiv');
             messageDiv.className = `message ${type}`;
@@ -367,48 +366,51 @@
 
                 const noticeId = generateNoticeId();
                 const transportationModes = collectTransportationModes();
-                
-                const noticeData = {
-                    noticeId,
-                    employeeOrganizing: formData.get('employeeOrganizing'),
-                    employeeContact: formData.get('employeeContact'),
-                    travelType: formData.get('travelType'),
-                    dateOfTravel: formData.get('dateOfTravel'),
-                    travelingTo: formData.get('travelingTo'),
-                    purposeOfTravel: formData.get('purposeOfTravel'),
-                    transportationMode: transportationModes,
-                    transportationOther: formData.get('transportationOther') || '',
-                    lodgingInfo: formData.get('lodgingInfo') || ''
+
+                const payload = {
+                    NoticeId: noticeId,
+                    EmployeeOrganizingTravel: formData.get('employeeOrganizing'),
+                    EmployeeContactInfo: formData.get('employeeContact'),
+                    TravelType: formData.get('travelType'),
+                    DatesOfTravel: formData.get('dateOfTravel'),
+                    TravelingTo: formData.get('travelingTo'),
+                    PurposeOfTravel: formData.get('purposeOfTravel'),
+                    TransportationMode: transportationModes,
+                    TransportationOther: formData.get('transportationOther') || '',
+                    LodgingInformation: formData.get('lodgingInfo') || '',
+                    students: students
                 };
 
-                // Get SharePoint form digest
-                const formDigest = await getFormDigest();
+                // Call Power Automate Flow 1
+                const response = await axios.post(FACULTY_FLOW_URL, payload, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-                // Create travel notice
-                await createTravelNotice(formDigest, noticeData);
-
-                // Create student waiver records
-                await createStudentWaivers(formDigest, noticeId, students);
-
-                showMessage('success', `Travel notice created successfully! Notice ID: ${noticeId}. Student invitation emails will be sent automatically.`);
-                
-                // Reset form
-                e.target.reset();
-                document.getElementById('studentsContainer').innerHTML = `
-                    <div class="student-row">
-                        <div style="flex: 1;">
-                            <label>Student Name</label>
-                            <input type="text" class="student-name" placeholder="Enter student name" required>
+                if (response.data && response.data.success) {
+                    showMessage('success', `Travel notice created successfully! Notice ID: ${noticeId}. Student invitation emails will be sent automatically.`);
+                    
+                    // Reset form
+                    e.target.reset();
+                    document.getElementById('studentsContainer').innerHTML = `
+                        <div class="student-row">
+                            <div style="flex: 1;">
+                                <label>Student Name</label>
+                                <input type="text" class="student-name" placeholder="Enter student name" required>
+                            </div>
+                            <div style="flex: 1;">
+                                <label>Student Email</label>
+                                <input type="email" class="student-email" placeholder="Enter student email" required>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-danger" onclick="removeStudent(this)">Remove</button>
+                            </div>
                         </div>
-                        <div style="flex: 1;">
-                            <label>Student Email</label>
-                            <input type="email" class="student-email" placeholder="Enter student email" required>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-danger" onclick="removeStudent(this)">Remove</button>
-                        </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    throw new Error(response.data.message || 'Unknown error occurred');
+                }
 
             } catch (error) {
                 console.error('Error:', error);
