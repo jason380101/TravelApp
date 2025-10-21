@@ -596,15 +596,11 @@
                 const noticeId = generateNoticeId();
                 const transportationModes = collectTransportationModes();
 
-                // Combine email and phone for EmployeeContactInfo
-                const employeeEmail = formData.get('employeeEmail');
-                const employeePhone = formData.get('employeePhone');
-                const employeeContactInfo = `${employeeEmail} | ${employeePhone}`;
-
                 const payload = {
                     NoticeId: noticeId,
                     EmployeeOrganizingTravel: formData.get('employeeOrganizing'),
-                    EmployeeContactInfo: employeeContactInfo,
+                    EmployeeEmail: formData.get('employeeEmail'),
+                    EmployeePhone: formData.get('employeePhone'),
                     TravelType: formData.get('travelType'),
                     DatesOfTravel: formData.get('dateOfTravel'),
                     TravelingTo: formData.get('travelingTo'),
