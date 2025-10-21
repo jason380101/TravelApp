@@ -6,8 +6,14 @@
     <title>Travel Waiver Completion</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Calibri, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
@@ -20,26 +26,39 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #0078d4;
+            color: #DB0A5B;
             text-align: center;
+            font-family: Calibri, sans-serif;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        h3 {
+            color: #DB0A5B;
+            font-family: Calibri, sans-serif;
+            margin-bottom: 10px;
+        }
+        h4 {
+            color: #DB0A5B;
+            font-family: Calibri, sans-serif;
+            margin-top: 0;
         }
         .trip-info {
-            background-color: #e3f2fd;
+            background-color: #fef0f5;
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
-            border-left: 4px solid #0078d4;
+            border-left: 4px solid #DB0A5B;
+        }
+        .trip-info p {
+            margin: 8px 0;
+            font-family: Calibri, sans-serif;
         }
         .additional-info-section {
-            background-color: #e8f4f8;
+            background-color: #fef0f5;
             padding: 25px;
             border-radius: 8px;
             margin: 20px 0;
-            border-left: 4px solid #0078d4;
-        }
-        .additional-info-section h4 {
-            margin-top: 0;
-            color: #0078d4;
+            border-left: 4px solid #DB0A5B;
         }
         .form-group {
             margin-bottom: 20px;
@@ -49,6 +68,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
+            font-family: Calibri, sans-serif;
         }
         .form-group input, .form-group textarea {
             width: 100%;
@@ -56,20 +76,21 @@
             border: 2px solid #e1e1e1;
             border-radius: 4px;
             font-size: 14px;
-            font-family: inherit;
+            font-family: Calibri, sans-serif;
             transition: border-color 0.3s;
         }
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
-            border-color: #0078d4;
+            border-color: #DB0A5B;
         }
         .form-group small {
             display: block;
             margin-top: 5px;
             font-size: 12px;
+            font-family: Calibri, sans-serif;
         }
         .required {
-            color: #dc3545;
+            color: #DB0A5B;
         }
         .waiver-content {
             background-color: #f8f9fa;
@@ -78,14 +99,19 @@
             margin: 20px 0;
             max-height: 300px;
             overflow-y: auto;
-            border: 1px solid #dee2e6;
+            border: 2px solid #DB0A5B;
+        }
+        .waiver-content p {
+            margin: 15px 0;
+            font-family: Calibri, sans-serif;
+            line-height: 1.6;
         }
         .agreement-section {
             margin: 30px 0;
             padding: 20px;
-            background-color: #fff3cd;
+            background-color: #fff8e1;
             border-radius: 8px;
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid #DB0A5B;
         }
         .checkbox-container {
             display: flex;
@@ -97,6 +123,10 @@
             margin-top: 5px;
             transform: scale(1.2);
         }
+        .checkbox-container label {
+            font-family: Calibri, sans-serif;
+            line-height: 1.6;
+        }
         .btn {
             padding: 15px 30px;
             border: none;
@@ -106,13 +136,14 @@
             font-weight: 600;
             transition: background-color 0.3s;
             width: 100%;
+            font-family: Calibri, sans-serif;
         }
         .btn-primary {
-            background-color: #0078d4;
+            background-color: #DB0A5B;
             color: white;
         }
         .btn-primary:hover {
-            background-color: #106ebe;
+            background-color: #b50849;
         }
         .btn-primary:disabled {
             background-color: #6c757d;
@@ -123,6 +154,7 @@
             border-radius: 4px;
             margin: 20px 0;
             text-align: center;
+            font-family: Calibri, sans-serif;
         }
         .message.success {
             background-color: #d4edda;
@@ -138,6 +170,8 @@
             display: none;
             text-align: center;
             margin: 20px 0;
+            color: #DB0A5B;
+            font-family: Calibri, sans-serif;
         }
     </style>
 </head>
@@ -160,25 +194,34 @@
         <div id="waiverForm" style="display: none;">
             <div class="waiver-content">
                 <h4>Travel Waiver and Release Form</h4>
-                <p>By participating in this University-sponsored travel activity, I understand and agree to the following terms:</p>
+                <p><strong>Students must read and complete this Waiver and Release prior to participating in any student travel.</strong></p>
                 
-                <p><strong>1. Assumption of Risk:</strong> I acknowledge that travel activities involve inherent risks, including but not limited to transportation accidents, illness, injury, and other unforeseen circumstances.</p>
+                <p>I, the undersigned, agree to the following:</p>
                 
-                <p><strong>2. Release of Liability:</strong> I hereby release and hold harmless the University, its employees, agents, and representatives from any and all claims, demands, or actions arising from my participation in this travel activity.</p>
+                <p><strong>(1)</strong> I shall indemnify Muskingum University ("University") and hold harmless its agents and its employees from all liability, losses, costs, claims, damages, and expenses, including attorney's fees, arising or claimed to have arisen out of personal injuries or death, or property damage or loss, sustained by me as a result of participating in this academic, athletic, or University-supported activity, however caused, including, without limitation claimed negligence on the part of University employees, other participants, or third parties. In addition, I shall indemnify the University, its agents and employees from all liability, losses, costs, claims, damages, and expenses, including attorney's fees, relating to claims or injury arising from my own negligence or intentional acts during my participation in this program (including travel to and from the activity sites) and I hereby RELEASE and forever DISCHARGE the University and its agents and employees from all such liability, loss, costs, claims, damages, or expenses.</p>
                 
-                <p><strong>3. Medical Treatment:</strong> I authorize University representatives to obtain necessary medical treatment for me in case of emergency.</p>
+                <p><strong>(2)</strong> I understand that the employee(s) for the activity are acting in their respective capacities as agents of the University, not individually, and hereby waive any and all claims I may have or purport to have against the University or against employee(s) individually for losses occasioned by any changes in travel plans, or for the failure of any of the companies providing transportation, lodging, meals, tour services, or other goods or services, as applies to the nature of this activity, to provide such services on a timely basis or for the failure to provide them at all.</p>
                 
-                <p><strong>4. Compliance with Policies:</strong> I agree to comply with all University policies, local laws, and instructions from faculty leaders during the travel period.</p>
+                <p><strong>(3)</strong> The University has the right to make cancellations, changes, or substitutions in the course, agenda, program, assigned employee(s), travel arrangements, or arrangements for other services, in the event of causes beyond its reasonable control, significantly changed conditions, or changes in the interests of the group.</p>
                 
-                <p><strong>5. COVID-19 Acknowledgment:</strong> I understand that travel during the COVID-19 pandemic involves additional health risks, and I agree to follow all applicable health and safety protocols.</p>
+                <p><strong>(4)</strong> I am solely responsible for obtaining and keeping safe my personal possessions, documents, money, travel tickets (as needed), and other property. I hereby WAIVE and RELEASE the University, and any assigned employee and volunteer, from any and all claims for expenses or losses of any nature and amount due to my failure to do so.</p>
                 
-                <p><strong>6. Insurance:</strong> I understand that I am responsible for ensuring I have appropriate health insurance coverage during travel.</p>
+                <p><strong>(5)</strong> In the event of illness or injury requiring medical care, I hereby authorize the employee to contact emergency services, if needed, or transport me to an appropriate medical facility, if requested. I authorize notification of my emergency contact. I hereby assume both physical risk associated with and responsibility for the cost of any medical treatment. It is my responsibility to obtain and keep in force adequate health insurance while traveling. I understand and agree I am financially responsible for my own medical expenses, and that any advance medical payment made by the University through the employee on my behalf shall be reimbursed to the University immediately.</p>
                 
-                <p><strong>7. Emergency Contact:</strong> I have provided accurate emergency contact information to the faculty organizer.</p>
+                <p><strong>(6)</strong> I understand and agree that while participating in the activity, I remain subject to the University's rules, regulations, and policies. I agree to adhere to such rules, regulations, and policies during my participation in the activity.</p>
+                
+                <p><strong>(7)</strong> I hereby authorize disclosure by the University to the emergency contact listed below of any academic or other relevant information regarding my participation in the activity. I WAIVE my rights as defined by the Family Right to Education Privacy Act (FERPA) for this purpose.</p>
+                
+                <p style="font-weight: 700; margin-top: 20px;"><strong>I have read and understand this document and agree that it will legally bind me, my heirs and assigns, and my estate.</strong></p>
             </div>
 
             <div class="additional-info-section">
                 <h4>Additional Information Required</h4>
+                
+                <div class="form-group">
+                    <label for="studentPhone">Student Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="studentPhone" placeholder="(555) 123-4567" required>
+                </div>
                 
                 <div class="form-group">
                     <label for="emergencyContact">Emergency Contact Name <span class="required">*</span></label>
@@ -186,8 +229,13 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="relationship">Relationship to Emergency Contact <span class="required">*</span></label>
+                    <label for="relationship">Relationship <span class="required">*</span></label>
                     <input type="text" id="relationship" placeholder="e.g., Parent, Spouse, Guardian" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="emergencyPhone">Emergency Contact Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="emergencyPhone" placeholder="(555) 123-4567" required>
                 </div>
                 
                 <div class="form-group">
@@ -228,7 +276,11 @@
             return {
                 noticeId: params.get('noticeId'),
                 trackingCode: params.get('tracking'),
-                email: params.get('email')
+                email: params.get('email'),
+                tripName: params.get('tripName'),
+                dates: params.get('dates'),
+                facultyName: params.get('facultyName'),
+                studentName: params.get('studentName')
             };
         }
 
@@ -258,15 +310,15 @@
                 window.waiverData = {
                     noticeId: params.noticeId,
                     trackingCode: params.trackingCode,
-                    studentEmail: params.email
+                    studentEmail: params.email,
+                    studentName: params.studentName || 'Student'
                 };
 
-                // Display basic trip info from URL parameters
-                // Note: In production, you might want to fetch full details from SharePoint via another flow
-                document.getElementById('tripName').textContent = `Travel Activity - ${params.noticeId}`;
-                document.getElementById('tripDates').textContent = 'See email for details';
-                document.getElementById('facultyName').textContent = 'See email for details';
-                document.getElementById('studentName').textContent = 'Student';
+                // Display trip information from URL parameters
+                document.getElementById('tripName').textContent = params.tripName || `Travel Activity - ${params.noticeId}`;
+                document.getElementById('tripDates').textContent = params.dates || 'See email for details';
+                document.getElementById('facultyName').textContent = params.facultyName || 'See email for details';
+                document.getElementById('studentName').textContent = params.studentName || 'Student';
 
                 // Show the form
                 document.getElementById('tripInfo').style.display = 'block';
@@ -287,12 +339,14 @@
             }
 
             // Validate required fields
+            const studentPhone = document.getElementById('studentPhone').value.trim();
             const emergencyContact = document.getElementById('emergencyContact').value.trim();
             const relationship = document.getElementById('relationship').value.trim();
+            const emergencyPhone = document.getElementById('emergencyPhone').value.trim();
             const studentSignature = document.getElementById('studentSignature').value.trim();
 
-            if (!emergencyContact || !relationship || !studentSignature) {
-                showMessage('error', 'Please fill in all required fields (Emergency Contact, Relationship, and Digital Signature).');
+            if (!studentPhone || !emergencyContact || !relationship || !emergencyPhone || !studentSignature) {
+                showMessage('error', 'Please fill in all required fields.');
                 return;
             }
 
@@ -306,8 +360,11 @@
                     NoticeId: window.waiverData.noticeId,
                     TrackingCode: window.waiverData.trackingCode,
                     StudentEmail: window.waiverData.studentEmail,
+                    StudentName: window.waiverData.studentName,
+                    StudentPhone: studentPhone,
                     EmergencyContact: emergencyContact,
                     Relationship: relationship,
+                    EmergencyPhone: emergencyPhone,
                     StudentSignature: studentSignature,
                     AdditionalInformationtoDisclose: additionalInfo
                 };
@@ -344,4 +401,3 @@
     </script>
 </body>
 </html>
-
