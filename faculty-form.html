@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Travel Notice Form</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Calibri, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
@@ -20,9 +27,11 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #0078d4;
+            color: #DB0A5B;
             text-align: center;
             margin-bottom: 30px;
+            font-family: Calibri, sans-serif;
+            font-weight: 600;
         }
         .form-group {
             margin-bottom: 20px;
@@ -32,18 +41,20 @@
             margin-bottom: 5px;
             font-weight: 600;
             color: #333;
+            font-family: Calibri, sans-serif;
         }
-        input[type="text"], input[type="email"], textarea, select {
+        input[type="text"], input[type="email"], input[type="tel"], textarea, select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e1e1e1;
             border-radius: 4px;
             font-size: 14px;
             transition: border-color 0.3s;
+            font-family: Calibri, sans-serif;
         }
-        input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus {
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #0078d4;
+            border-color: #DB0A5B;
         }
         .checkbox-group {
             padding: 10px 0;
@@ -53,6 +64,7 @@
             margin-bottom: 8px;
             font-weight: normal;
             cursor: pointer;
+            font-family: Calibri, sans-serif;
         }
         .checkbox-label input[type="checkbox"] {
             margin-right: 8px;
@@ -64,6 +76,11 @@
             padding: 20px;
             margin: 20px 0;
             background-color: #fafafa;
+        }
+        .student-section h3 {
+            color: #DB0A5B;
+            font-family: Calibri, sans-serif;
+            margin-bottom: 20px;
         }
         .student-row {
             display: flex;
@@ -82,21 +99,22 @@
             font-size: 14px;
             font-weight: 600;
             transition: background-color 0.3s;
+            font-family: Calibri, sans-serif;
         }
         .btn-primary {
-            background-color: #0078d4;
+            background-color: #DB0A5B;
             color: white;
         }
         .btn-primary:hover {
-            background-color: #106ebe;
+            background-color: #b50849;
         }
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: #000000;
             color: white;
             margin-left: 10px;
         }
         .btn-secondary:hover {
-            background-color: #545b62;
+            background-color: #333333;
         }
         .btn-danger {
             background-color: #dc3545;
@@ -116,18 +134,21 @@
             text-align: center;
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 2px solid #e1e1e1;
+            border-top: 2px solid #DB0A5B;
         }
         .loading {
             display: none;
             text-align: center;
             margin: 20px 0;
+            color: #DB0A5B;
+            font-family: Calibri, sans-serif;
         }
         .message {
             padding: 15px;
             border-radius: 4px;
             margin: 20px 0;
             display: none;
+            font-family: Calibri, sans-serif;
         }
         .message.success {
             background-color: #d4edda;
@@ -140,14 +161,99 @@
             border: 1px solid #f5c6cb;
         }
         .required {
-            color: #dc3545;
+            color: #DB0A5B;
         }
         .instructions {
-            background-color: #e3f2fd;
+            background-color: #fef0f5;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 30px;
-            border-left: 4px solid #0078d4;
+            border-left: 4px solid #DB0A5B;
+            font-family: Calibri, sans-serif;
+        }
+        .instructions a {
+            color: #DB0A5B;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .instructions a:hover {
+            text-decoration: underline;
+        }
+        /* CSV Upload Styles */
+        .csv-upload-box {
+            background-color: #fff8e1;
+            border: 2px dashed #DB0A5B;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .csv-upload-box h4 {
+            color: #DB0A5B;
+            margin-bottom: 10px;
+            font-family: Calibri, sans-serif;
+        }
+        .csv-instructions {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            font-family: Calibri, sans-serif;
+        }
+        .csv-instructions code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #DB0A5B;
+            font-family: 'Courier New', monospace;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-upload-btn {
+            background-color: #DB0A5B;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s;
+            font-family: Calibri, sans-serif;
+            font-weight: 600;
+        }
+        .file-upload-btn:hover {
+            background-color: #b50849;
+        }
+        .file-name-display {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+            font-style: italic;
+            font-family: Calibri, sans-serif;
+        }
+        .csv-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            font-family: Calibri, sans-serif;
+        }
+        .csv-message.success {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        .csv-message.error {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -157,7 +263,7 @@
         
         <div class="instructions">
             <p><strong>Instructions:</strong> This form must be completed by the employee organizing travel for an academic or University-supported activity. At least two weeks prior to overnight travel, submit this form to the area vice president, or designee.</p>
-            <p>All travel must be conducted in accordance with the University's Safety Policies. For further information, please see the <a href="https://www.google.com/url?client=internal-element-cse&cx=000807273808135637393:ncecgo51k-8&q=https://www.muskingum.edu/sites/default/files/media/Academic%2520Affairs/Student%2520Travel%2520Policy.pdf&sa=U&ved=2ahUKEwiAzYfPwquQAxViEVkFHS4IFgAQFnoECAoQAQ&usg=AOvVaw1e25RGECK_lzZGbLlgGQsm">Student Travel Policy</a></p>
+            <p>All travel must be conducted in accordance with the University's Safety Policies. For further information, please see the <a href="https://www.google.com/url?client=internal-element-cse&cx=000807273808135637393:ncecgo51k-8&q=https://www.muskingum.edu/sites/default/files/media/Academic%2520Affairs/Student%2520Travel%2520Policy.pdf&sa=U&ved=2ahUKEwiAzYfPwquQAxViEVkFHS4IFgAQFnoECAoQAQ&usg=AOvVaw1e25RGECK_lzZGbLlgGQsm" target="_blank">Student Travel Policy</a></p>
         </div>
 
         <div class="message" id="messageDiv"></div>
@@ -171,9 +277,16 @@
                 <input type="text" id="employeeOrganizing" name="employeeOrganizing" required>
             </div>
 
-            <div class="form-group">
-                <label for="employeeContact">Employee's contact information during travel <span class="required">*</span></label>
-                <input type="text" id="employeeContact" name="employeeContact" placeholder="Email and phone number" required>
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="employeeEmail">Employee Email <span class="required">*</span></label>
+                    <input type="email" id="employeeEmail" name="employeeEmail" placeholder="email@muskingum.edu" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="employeePhone">Employee Phone <span class="required">*</span></label>
+                    <input type="tel" id="employeePhone" name="employeePhone" placeholder="(740) 826-8000" required>
+                </div>
             </div>
 
             <div class="form-group">
@@ -231,6 +344,19 @@
 
             <div class="student-section">
                 <h3>Student Travelers</h3>
+                
+                <!-- CSV Upload Section -->
+                <div class="csv-upload-box">
+                    <h4>📂 Bulk Upload Students via CSV</h4>
+                    <div class="csv-instructions">
+                        Upload a CSV file with columns: <code>Student Name</code>, <code>Student Email</code>
+                    </div>
+                    <label for="csvFile" class="file-upload-btn">Choose CSV File</label>
+                    <input type="file" id="csvFile" accept=".csv">
+                    <div class="file-name-display" id="fileNameDisplay"></div>
+                    <div class="csv-message" id="csvMessage"></div>
+                </div>
+
                 <div id="studentsContainer">
                     <div class="student-row">
                         <div style="flex: 1;">
@@ -258,6 +384,107 @@
     <script>
         // Configuration - UPDATE THIS VALUE WITH YOUR FLOW 1 URL
         const FACULTY_FLOW_URL = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ce9daee0c15840e5aeccd8a68840572d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=JiEWEQRESdSq2mPHhb3o5cd59Z_F25iVZzHwIhK7ids';
+
+        // CSV Upload Handler
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileNameDisplay').textContent = `Selected: ${file.name}`;
+            hideCsvMessage();
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    handleCSVData(results.data);
+                },
+                error: function(error) {
+                    showCsvMessage('error', 'Error parsing CSV: ' + error.message);
+                }
+            });
+        });
+
+        function handleCSVData(data) {
+            if (data.length === 0) {
+                showCsvMessage('error', 'CSV file is empty');
+                return;
+            }
+
+            // Check for required columns (case-insensitive)
+            const firstRow = data[0];
+            const hasStudentName = Object.keys(firstRow).some(key => 
+                key.toLowerCase().includes('student') && key.toLowerCase().includes('name')
+            );
+            const hasStudentEmail = Object.keys(firstRow).some(key => 
+                key.toLowerCase().includes('student') && key.toLowerCase().includes('email')
+            );
+
+            if (!hasStudentName || !hasStudentEmail) {
+                showCsvMessage('error', 'CSV must contain "Student Name" and "Student Email" columns');
+                return;
+            }
+
+            // Clear existing students
+            document.getElementById('studentsContainer').innerHTML = '';
+
+            // Add each student from CSV
+            let addedCount = 0;
+            data.forEach(row => {
+                // Find the student name and email columns (case-insensitive)
+                const nameKey = Object.keys(row).find(key => 
+                    key.toLowerCase().includes('student') && key.toLowerCase().includes('name')
+                );
+                const emailKey = Object.keys(row).find(key => 
+                    key.toLowerCase().includes('student') && key.toLowerCase().includes('email')
+                );
+
+                const studentName = row[nameKey]?.trim();
+                const studentEmail = row[emailKey]?.trim();
+
+                if (studentName && studentEmail) {
+                    addStudentWithData(studentName, studentEmail);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                showCsvMessage('success', `✓ Successfully added ${addedCount} student(s) from CSV`);
+            } else {
+                showCsvMessage('error', 'No valid student records found in CSV');
+            }
+        }
+
+        function addStudentWithData(name, email) {
+            const container = document.getElementById('studentsContainer');
+            const studentRow = document.createElement('div');
+            studentRow.className = 'student-row';
+            studentRow.innerHTML = `
+                <div style="flex: 1;">
+                    <label>Student Name</label>
+                    <input type="text" class="student-name" value="${name}" placeholder="Enter student name" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Student Email</label>
+                    <input type="email" class="student-email" value="${email}" placeholder="Enter student email" required>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" onclick="removeStudent(this)">Remove</button>
+                </div>
+            `;
+            container.appendChild(studentRow);
+        }
+
+        function showCsvMessage(type, text) {
+            const msgDiv = document.getElementById('csvMessage');
+            msgDiv.className = `csv-message ${type}`;
+            msgDiv.textContent = text;
+            msgDiv.style.display = 'block';
+        }
+
+        function hideCsvMessage() {
+            document.getElementById('csvMessage').style.display = 'none';
+        }
 
         function addStudent() {
             const container = document.getElementById('studentsContainer');
@@ -369,10 +596,15 @@
                 const noticeId = generateNoticeId();
                 const transportationModes = collectTransportationModes();
 
+                // Combine email and phone for EmployeeContactInfo
+                const employeeEmail = formData.get('employeeEmail');
+                const employeePhone = formData.get('employeePhone');
+                const employeeContactInfo = `${employeeEmail} | ${employeePhone}`;
+
                 const payload = {
                     NoticeId: noticeId,
                     EmployeeOrganizingTravel: formData.get('employeeOrganizing'),
-                    EmployeeContactInfo: formData.get('employeeContact'),
+                    EmployeeContactInfo: employeeContactInfo,
                     TravelType: formData.get('travelType'),
                     DatesOfTravel: formData.get('dateOfTravel'),
                     TravelingTo: formData.get('travelingTo'),
@@ -410,6 +642,8 @@
                             </div>
                         </div>
                     `;
+                    document.getElementById('fileNameDisplay').textContent = '';
+                    hideCsvMessage();
                 } else {
                     throw new Error(response.data.message || 'Unknown error occurred');
                 }
@@ -424,7 +658,3 @@
     </script>
 </body>
 </html>
-
-
-
-
