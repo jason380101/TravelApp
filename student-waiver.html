@@ -180,10 +180,12 @@
         <h1>Travel Waiver Completion</h1>
         
         <div id="tripInfo" class="trip-info" style="display: none;">
-            <h3 id="tripName"></h3>
-            <p><strong>Dates:</strong> <span id="tripDates"></span></p>
+            <h3>Travel Information</h3>
+            <p><strong>Destination:</strong> <span id="tripDestination"></span></p>
             <p><strong>Faculty Organizer:</strong> <span id="facultyName"></span></p>
-            <p><strong>Student:</strong> <span id="studentName"></span></p>
+            <p><strong>Dates:</strong> <span id="tripDates"></span></p>
+            <p><strong>Purpose of Travel:</strong> <span id="purposeOfTravel"></span></p>
+            <p><strong>Student Name:</strong> <span id="studentName"></span></p>
         </div>
 
         <div class="message" id="messageDiv" style="display: none;"></div>
@@ -280,7 +282,8 @@
                 tripName: params.get('tripName'),
                 dates: params.get('dates'),
                 facultyName: params.get('facultyName'),
-                studentName: params.get('studentName')
+                studentName: params.get('studentName'),
+                purposeOfTravel: params.get('purpose')
             };
         }
 
@@ -315,9 +318,10 @@
                 };
 
                 // Display trip information from URL parameters
-                document.getElementById('tripName').textContent = params.tripName || `Travel Activity - ${params.noticeId}`;
-                document.getElementById('tripDates').textContent = params.dates || 'See email for details';
+                document.getElementById('tripDestination').textContent = params.tripName || 'See email for details';
                 document.getElementById('facultyName').textContent = params.facultyName || 'See email for details';
+                document.getElementById('tripDates').textContent = params.dates || 'See email for details';
+                document.getElementById('purposeOfTravel').textContent = params.purposeOfTravel || 'See email for details';
                 document.getElementById('studentName').textContent = params.studentName || 'Student';
 
                 // Show the form
