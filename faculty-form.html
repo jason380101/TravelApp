@@ -6,6 +6,7 @@
     <title>Faculty Travel Notice Form</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -259,7 +260,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Notice for Student Travel</h1>
+        <h1>Travel for Student Activities Faculty Form</h1>
         
         <div class="instructions">
             <p><strong>Instructions:</strong> This form must be completed by the employee organizing travel for an academic or University-supported activity. At least two weeks prior to overnight travel, submit this form to the area vice president, or designee.</p>
@@ -347,12 +348,13 @@
                 
                 <!-- CSV Upload Section -->
                 <div class="csv-upload-box">
-                    <h4>📂 Bulk Upload Students via CSV</h4>
+                    <h4>📂 Bulk Upload Students via CSV or Excel</h4>
                     <div class="csv-instructions">
-                        Upload a CSV file with columns: <code>Student Name</code>, <code>Student Email</code>
+                        Upload a CSV or Excel file with columns: <code>Student Name</code>, <code>Student Email</code><br>
+                        <a href="#" onclick="downloadTemplate(); return false;" style="color: #DB0A5B; font-weight: 600; text-decoration: underline;">Download Template</a>
                     </div>
-                    <label for="csvFile" class="file-upload-btn">Choose CSV File</label>
-                    <input type="file" id="csvFile" accept=".csv">
+                    <label for="csvFile" class="file-upload-btn">Choose CSV or Excel File</label>
+                    <input type="file" id="csvFile" accept=".csv,.xlsx,.xls">
                     <div class="file-name-display" id="fileNameDisplay"></div>
                     <div class="csv-message" id="csvMessage"></div>
                 </div>
@@ -385,7 +387,7 @@
         // Configuration - UPDATE THIS VALUE WITH YOUR FLOW 1 URL
         const FACULTY_FLOW_URL = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ce9daee0c15840e5aeccd8a68840572d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=JiEWEQRESdSq2mPHhb3o5cd59Z_F25iVZzHwIhK7ids';
 
-        // CSV Upload Handler
+        // CSV/Excel Upload Handler
         document.getElementById('csvFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -393,21 +395,65 @@
             document.getElementById('fileNameDisplay').textContent = `Selected: ${file.name}`;
             hideCsvMessage();
 
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    handleCSVData(results.data);
-                },
-                error: function(error) {
-                    showCsvMessage('error', 'Error parsing CSV: ' + error.message);
-                }
-            });
+            const fileName = file.name.toLowerCase();
+            
+            if (fileName.endsWith('.csv')) {
+                // Handle CSV file
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        handleStudentData(results.data);
+                    },
+                    error: function(error) {
+                        showCsvMessage('error', 'Error parsing CSV: ' + error.message);
+                    }
+                });
+            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                // Handle Excel file
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        handleStudentData(jsonData);
+                    } catch (error) {
+                        showCsvMessage('error', 'Error parsing Excel file: ' + error.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                showCsvMessage('error', 'Please upload a CSV or Excel file (.csv, .xlsx, .xls)');
+            }
         });
 
-        function handleCSVData(data) {
+        function downloadTemplate() {
+            // Create sample data
+            const templateData = [
+                { 'Student Name': 'John Doe', 'Student Email': 'john.doe@student.edu' },
+                { 'Student Name': 'Jane Smith', 'Student Email': 'jane.smith@student.edu' }
+            ];
+
+            // Create CSV content
+            const csv = Papa.unparse(templateData);
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'student_upload_template.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function handleStudentData(data) {
             if (data.length === 0) {
-                showCsvMessage('error', 'CSV file is empty');
+                showCsvMessage('error', 'File is empty');
                 return;
             }
 
@@ -421,14 +467,14 @@
             );
 
             if (!hasStudentName || !hasStudentEmail) {
-                showCsvMessage('error', 'CSV must contain "Student Name" and "Student Email" columns');
+                showCsvMessage('error', 'File must contain "Student Name" and "Student Email" columns');
                 return;
             }
 
             // Clear existing students
             document.getElementById('studentsContainer').innerHTML = '';
 
-            // Add each student from CSV
+            // Add each student from file
             let addedCount = 0;
             data.forEach(row => {
                 // Find the student name and email columns (case-insensitive)
@@ -439,8 +485,8 @@
                     key.toLowerCase().includes('student') && key.toLowerCase().includes('email')
                 );
 
-                const studentName = row[nameKey]?.trim();
-                const studentEmail = row[emailKey]?.trim();
+                const studentName = row[nameKey]?.toString().trim();
+                const studentEmail = row[emailKey]?.toString().trim();
 
                 if (studentName && studentEmail) {
                     addStudentWithData(studentName, studentEmail);
@@ -449,9 +495,9 @@
             });
 
             if (addedCount > 0) {
-                showCsvMessage('success', `✓ Successfully added ${addedCount} student(s) from CSV`);
+                showCsvMessage('success', `✓ Successfully added ${addedCount} student(s) from file`);
             } else {
-                showCsvMessage('error', 'No valid student records found in CSV');
+                showCsvMessage('error', 'No valid student records found in file');
             }
         }
 
@@ -653,5 +699,4 @@
         });
     </script>
 </body>
-
 </html>
