@@ -655,20 +655,14 @@
                 const noticeId = generateNoticeId();
                 const transportationModes = collectTransportationModes();
 
-                // Format dates for display
-                const departureDate = formData.get('departureDate');
-                const returnDate = formData.get('returnDate');
-                const datesOfTravel = `${formatDate(departureDate)} - ${formatDate(returnDate)}`;
-
                 const payload = {
                     NoticeId: noticeId,
                     EmployeeOrganizingTravel: formData.get('employeeOrganizing'),
                     EmployeeEmail: formData.get('employeeEmail'),
                     EmployeePhone: formData.get('employeePhone'),
                     TravelType: formData.get('travelType'),
-                    DepartureDate: departureDate,
-                    ReturnDate: returnDate,
-                    DatesOfTravel: datesOfTravel,
+                    DepartureDate: formData.get('departureDate'),
+                    ReturnDate: formData.get('returnDate'),
                     TravelingTo: formData.get('travelingTo'),
                     PurposeOfTravel: formData.get('purposeOfTravel'),
                     TransportationMode: transportationModes,
