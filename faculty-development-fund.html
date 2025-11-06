@@ -462,55 +462,75 @@
                         <thead>
                             <tr>
                                 <th>Expense Category</th>
-                                <th style="width: 200px;">Anticipated Expense (USD)</th>
+                                <th style="width: 180px;">Anticipated Expense (USD)</th>
+                                <th style="width: 180px;">Actual Expense (USD)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Membership dues* <small style="color: #666;">*One per year, cap of $200</small></td>
-                                <td><input type="number" step="0.01" min="0" max="200" id="membershipDues" name="membershipDues" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" max="200" id="membershipDues" name="membershipDues" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" max="200" id="membershipDuesActual" name="membershipDuesActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>Air Travel</td>
-                                <td><input type="number" step="0.01" min="0" id="airTravel" name="airTravel" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="airTravel" name="airTravel" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="airTravelActual" name="airTravelActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>Mileage <small>($0.70 per mile)</small></td>
-                                <td><input type="number" step="0.01" min="0" id="mileage" name="mileage" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="mileage" name="mileage" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="mileageActual" name="mileageActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>Other Ground Travel</td>
-                                <td><input type="number" step="0.01" min="0" id="groundTravel" name="groundTravel" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="groundTravel" name="groundTravel" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="groundTravelActual" name="groundTravelActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>Registration Costs</td>
-                                <td><input type="number" step="0.01" min="0" id="registrationCosts" name="registrationCosts" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="registrationCosts" name="registrationCosts" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="registrationCostsActual" name="registrationCostsActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>Lodging</td>
-                                <td><input type="number" step="0.01" min="0" id="lodging" name="lodging" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="lodging" name="lodging" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="lodgingActual" name="lodgingActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>Meals & Incidentals</td>
-                                <td><input type="number" step="0.01" min="0" id="mealsIncidentals" name="mealsIncidentals" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="mealsIncidentals" name="mealsIncidentals" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="mealsIncidentalsActual" name="mealsIncidentalsActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr>
                                 <td>
                                     Other (describe): 
                                     <input type="text" id="otherExpenseDesc" name="otherExpenseDesc" placeholder="Description" style="margin-top: 5px;">
                                 </td>
-                                <td><input type="number" step="0.01" min="0" id="otherExpense" name="otherExpense" placeholder="0.00" class="expense-input"></td>
+                                <td><input type="number" step="0.01" min="0" id="otherExpense" name="otherExpense" placeholder="0.00" class="expense-input-anticipated"></td>
+                                <td><input type="number" step="0.01" min="0" id="otherExpenseActual" name="otherExpenseActual" placeholder="0.00" class="expense-input-actual"></td>
                             </tr>
                             <tr class="total-row">
                                 <td><strong>Total ($1,000 maximum)</strong></td>
                                 <td><span class="total-value" id="totalAnticipated">$0.00</span></td>
+                                <td><span class="total-value" id="totalActual">$0.00</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="info-box">
-                    <strong>Note:</strong> The maximum funding approval is $1,000. If your total exceeds this amount, you'll need to adjust your anticipated expenses.
+                    <strong>Note:</strong> The maximum funding approval is $1,000. 
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li><strong>Anticipated Expense:</strong> Complete this column when requesting funding approval before your activity</li>
+                        <li><strong>Actual Expense:</strong> Complete this column when submitting for reimbursement after your activity is completed (with receipts)</li>
+                    </ul>
+                    
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ffc107;">
+                        <p style="margin-bottom: 10px;"><strong>A. Request for Funding Reimbursement</strong></p>
+                        <p style="margin-bottom: 10px;">Complete the "actual expense" column above.</p>
+                        <p style="margin-bottom: 0;"><strong>Note:</strong> Receipts and mileage maps must be attached for reimbursement. The request for funding reimbursement must be submitted within one month after completion of the approved activities. June reimbursement requests must be submitted by June 30, i.e., the end of the fiscal year in which the activity took place. Currently, only physical receipts are accepted for reimbursement.</p>
+                    </div>
                 </div>
             </div>
 
@@ -537,43 +557,62 @@
                 <button type="submit" class="submit-btn" id="submitBtn">Submit Request</button>
             </div>
         </form>
-
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 13px;">
-            <p><strong>For Reimbursement:</strong> After your activity is completed, submit actual expenses along with receipts and mileage maps within one month (or by June 30 for same-year activities).</p>
-            <p style="margin-top: 10px;">Questions? Contact the Provost's Office at Muskingum University.</p>
-        </div>
     </div>
 
     <script>
         // Configuration - UPDATE THIS URL WITH YOUR POWER AUTOMATE FLOW URL
         const FLOW_URL = 'YOUR_POWER_AUTOMATE_FLOW_URL_HERE';
 
-        // Auto-calculate total anticipated expenses
-        const expenseInputs = document.querySelectorAll('.expense-input');
-        expenseInputs.forEach(input => {
-            input.addEventListener('input', calculateTotal);
+        // Auto-calculate total anticipated and actual expenses
+        const anticipatedInputs = document.querySelectorAll('.expense-input-anticipated');
+        const actualInputs = document.querySelectorAll('.expense-input-actual');
+        
+        anticipatedInputs.forEach(input => {
+            input.addEventListener('input', calculateTotals);
+        });
+        
+        actualInputs.forEach(input => {
+            input.addEventListener('input', calculateTotals);
         });
 
-        function calculateTotal() {
-            let total = 0;
-            expenseInputs.forEach(input => {
+        function calculateTotals() {
+            // Calculate anticipated total
+            let anticipatedTotal = 0;
+            anticipatedInputs.forEach(input => {
                 const value = parseFloat(input.value) || 0;
-                total += value;
+                anticipatedTotal += value;
             });
 
-            const totalElement = document.getElementById('totalAnticipated');
-            totalElement.textContent = `$${total.toFixed(2)}`;
+            // Calculate actual total
+            let actualTotal = 0;
+            actualInputs.forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                actualTotal += value;
+            });
 
-            // Warn if over $1,000
-            if (total > 1000) {
-                totalElement.style.color = '#dc3545';
+            const anticipatedElement = document.getElementById('totalAnticipated');
+            const actualElement = document.getElementById('totalActual');
+            
+            anticipatedElement.textContent = `$${anticipatedTotal.toFixed(2)}`;
+            actualElement.textContent = `$${actualTotal.toFixed(2)}`;
+
+            // Warn if anticipated exceeds $1,000
+            if (anticipatedTotal > 1000) {
+                anticipatedElement.style.color = '#dc3545';
                 showMessage('error', 'Warning: Total anticipated expenses exceed the $1,000 maximum. Please adjust your expenses.');
             } else {
-                totalElement.style.color = '#DB0A5B';
+                anticipatedElement.style.color = '#DB0A5B';
                 const messageDiv = document.getElementById('messageDiv');
                 if (messageDiv.classList.contains('error') && messageDiv.textContent.includes('exceed')) {
                     messageDiv.style.display = 'none';
                 }
+            }
+
+            // Warn if actual exceeds $1,000 (informational)
+            if (actualTotal > 1000) {
+                actualElement.style.color = '#ffc107';
+            } else {
+                actualElement.style.color = '#DB0A5B';
             }
         }
 
@@ -600,8 +639,8 @@
             }
 
             // Validate total doesn't exceed $1,000
-            const total = calculateTotalValue();
-            if (total > 1000) {
+            const anticipatedTotal = calculateTotalValue('anticipated');
+            if (anticipatedTotal > 1000) {
                 showMessage('error', 'Total anticipated expenses cannot exceed $1,000. Please adjust your expenses before submitting.');
                 return;
             }
@@ -623,8 +662,8 @@
                     selectedActivities[selectedActivities.indexOf('Other')] = `Other: ${formData.get('otherActivityDesc')}`;
                 }
 
-                // Build expense breakdown
-                const expenses = {
+                // Build anticipated expense breakdown
+                const anticipatedExpenses = {
                     membershipDues: parseFloat(formData.get('membershipDues')) || 0,
                     airTravel: parseFloat(formData.get('airTravel')) || 0,
                     mileage: parseFloat(formData.get('mileage')) || 0,
@@ -634,7 +673,21 @@
                     mealsIncidentals: parseFloat(formData.get('mealsIncidentals')) || 0,
                     otherExpense: parseFloat(formData.get('otherExpense')) || 0,
                     otherExpenseDesc: formData.get('otherExpenseDesc') || '',
-                    total: total
+                    total: anticipatedTotal
+                };
+
+                // Build actual expense breakdown
+                const actualTotal = calculateTotalValue('actual');
+                const actualExpenses = {
+                    membershipDues: parseFloat(formData.get('membershipDuesActual')) || 0,
+                    airTravel: parseFloat(formData.get('airTravelActual')) || 0,
+                    mileage: parseFloat(formData.get('mileageActual')) || 0,
+                    groundTravel: parseFloat(formData.get('groundTravelActual')) || 0,
+                    registrationCosts: parseFloat(formData.get('registrationCostsActual')) || 0,
+                    lodging: parseFloat(formData.get('lodgingActual')) || 0,
+                    mealsIncidentals: parseFloat(formData.get('mealsIncidentalsActual')) || 0,
+                    otherExpense: parseFloat(formData.get('otherExpenseActual')) || 0,
+                    total: actualTotal
                 };
 
                 // Build payload for Power Automate
@@ -646,7 +699,8 @@
                     activityDescription: formData.get('activityDescription'),
                     professionalValue: formData.get('professionalValue'),
                     classArrangements: formData.get('classArrangements') || 'N/A',
-                    expenses: expenses,
+                    anticipatedExpenses: anticipatedExpenses,
+                    actualExpenses: actualExpenses,
                     facultySignature: formData.get('facultySignature'),
                     submittedAt: new Date().toISOString()
                 };
@@ -661,7 +715,7 @@
                 showMessage('success', 'Your Faculty Development Fund request has been submitted successfully! You will receive a confirmation email shortly.');
                 e.target.reset();
                 document.getElementById('submissionDate').valueAsDate = new Date();
-                calculateTotal();
+                calculateTotals();
 
             } catch (error) {
                 console.error('Submission error:', error);
@@ -671,9 +725,10 @@
             }
         });
 
-        function calculateTotalValue() {
+        function calculateTotalValue(type) {
             let total = 0;
-            expenseInputs.forEach(input => {
+            const inputs = type === 'anticipated' ? anticipatedInputs : actualInputs;
+            inputs.forEach(input => {
                 total += parseFloat(input.value) || 0;
             });
             return total;
