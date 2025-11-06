@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Professional Development Funding Request - Muskingum University</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Calibri, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #DB0A5B;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #DB0A5B;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #DB0A5B;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #DB0A5B;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .required {
+            color: #DB0A5B;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #DB0A5B;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .checkbox-label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="text"] {
+            margin-left: 10px;
+            width: auto;
+            flex: 1;
+        }
+
+        .info-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box strong {
+            color: #856404;
+        }
+
+        .warning-box {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box strong {
+            color: #721c24;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .expense-table table {
+            width: 100%;
+            border: 2px solid #DB0A5B;
+        }
+
+        .expense-table th {
+            background-color: #DB0A5B;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .expense-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .expense-table input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .expense-table input[type="number"]:focus {
+            border-color: #DB0A5B;
+            outline: none;
+        }
+
+        .expense-table .total-row {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        .expense-table .total-value {
+            color: #DB0A5B;
+            font-size: 18px;
+        }
+
+        .links-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .links-box a {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .links-box a:hover {
+            text-decoration: underline;
+        }
+
+        .submit-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #DB0A5B;
+        }
+
+        .agreement-checkbox {
+            display: flex;
+            align-items: flex-start;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .agreement-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 4px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .agreement-checkbox label {
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background-color: #DB0A5B;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: #b00847;
+        }
+
+        .submit-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #DB0A5B;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        small {
+            display: block;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .expense-table {
+                font-size: 12px;
+            }
+
+            .expense-table th,
+            .expense-table td {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Faculty Professional Development Funding and Reimbursement Request</h1>
+            <p>Muskingum University</p>
+        </div>
+
+        <div id="messageDiv" class="message"></div>
+        <div id="loadingDiv" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Submitting your request...</p>
+        </div>
+
+        <form id="developmentFundForm">
+            <!-- Basic Information -->
+            <div class="section">
+                <h2 class="section-title">Basic Information</h2>
+                
+                <div class="form-group">
+                    <label for="facultyName">Name <span class="required">*</span></label>
+                    <input type="text" id="facultyName" name="facultyName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department <span class="required">*</span></label>
+                    <input type="text" id="department" name="department" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="submissionDate">Date <span class="required">*</span></label>
+                    <input type="date" id="submissionDate" name="submissionDate" required>
+                </div>
+            </div>
+
+            <!-- Eligible Activities -->
+            <div class="section">
+                <h2 class="section-title">Eligible Activities</h2>
+                <p style="margin-bottom: 15px;">Check all that apply:</p>
+                
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Attending academic or professional conferences">
+                        Attending academic or professional conferences
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Presenting papers or serving as a panelist or session chair">
+                        Presenting papers or serving as a panelist or session chair
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Participating in workshops, seminars, or training programs">
+                        Participating in workshops, seminars, or training programs
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Enrolling in courses or certifications relevant to one's discipline or teaching">
+                        Enrolling in courses or certifications relevant to one's discipline or teaching
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Travel directly related to professional development">
+                        Travel directly related to professional development
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Membership dues (one per year, cap of $200)">
+                        Membership dues (one per year, cap of $200)
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="eligibleActivities" value="Other" id="otherActivityCheckbox">
+                        Other (describe):
+                        <input type="text" id="otherActivityDesc" name="otherActivityDesc" placeholder="Describe additional business-appropriate travel expenses">
+                    </label>
+                </div>
+
+                <div class="warning-box">
+                    <strong>Ineligible Activities (not an exhaustive list):</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Certification and licensure reimbursements</li>
+                        <li>Equipment and technology purchases</li>
+                        <li>Entertainment, alcoholic beverages, or non-professional outings</li>
+                        <li>Expenses unrelated to faculty duties or professional growth</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Request for Funding Approval -->
+            <div class="section">
+                <h2 class="section-title">Request for Funding Approval</h2>
+                
+                <div class="form-group">
+                    <label for="activityDescription">Description and date(s) of the professional development activity <span class="required">*</span></label>
+                    <textarea id="activityDescription" name="activityDescription" rows="4" placeholder="Provide detailed description and dates of the activity" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="professionalValue">Explain the link and value to your professional development <span class="required">*</span></label>
+                    <textarea id="professionalValue" name="professionalValue" rows="5" placeholder="Be as detailed as possible, including how the membership dues directly support your professional development (if applicable)" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="classArrangements">What arrangements will you make to cover classes in your absence (if relevant)?</label>
+                    <textarea id="classArrangements" name="classArrangements" rows="3" placeholder="Describe class coverage arrangements or enter 'N/A' if not applicable"></textarea>
+                </div>
+            </div>
+
+            <!-- Anticipated Expenses -->
+            <div class="section">
+                <h2 class="section-title">Anticipated Expenses</h2>
+                
+                <div class="links-box">
+                    <p style="margin-bottom: 10px;"><strong>Use the US General Service Administration allowances for reimbursable expenses:</strong></p>
+                    <p>📍 <strong>Domestic travel:</strong> <a href="https://www.gsa.gov/travel" target="_blank">https://www.gsa.gov/travel</a> (Click "Plan a Trip")</p>
+                    <p>🌍 <strong>International travel:</strong> <a href="https://allowances.state.gov/web920/per_diem.asp" target="_blank">https://allowances.state.gov/web920/per_diem.asp</a></p>
+                    <p style="margin-top: 10px; font-size: 13px; color: #666;">Note: Allowances remain in effect up to September 2026</p>
+                </div>
+
+                <div class="expense-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Expense Category</th>
+                                <th style="width: 200px;">Anticipated Expense (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Membership dues* <small style="color: #666;">*One per year, cap of $200</small></td>
+                                <td><input type="number" step="0.01" min="0" max="200" id="membershipDues" name="membershipDues" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>Air Travel</td>
+                                <td><input type="number" step="0.01" min="0" id="airTravel" name="airTravel" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>Mileage <small>($0.70 per mile)</small></td>
+                                <td><input type="number" step="0.01" min="0" id="mileage" name="mileage" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>Other Ground Travel</td>
+                                <td><input type="number" step="0.01" min="0" id="groundTravel" name="groundTravel" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>Registration Costs</td>
+                                <td><input type="number" step="0.01" min="0" id="registrationCosts" name="registrationCosts" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>Lodging</td>
+                                <td><input type="number" step="0.01" min="0" id="lodging" name="lodging" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>Meals & Incidentals</td>
+                                <td><input type="number" step="0.01" min="0" id="mealsIncidentals" name="mealsIncidentals" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Other (describe): 
+                                    <input type="text" id="otherExpenseDesc" name="otherExpenseDesc" placeholder="Description" style="margin-top: 5px;">
+                                </td>
+                                <td><input type="number" step="0.01" min="0" id="otherExpense" name="otherExpense" placeholder="0.00" class="expense-input"></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Total ($1,000 maximum)</strong></td>
+                                <td><span class="total-value" id="totalAnticipated">$0.00</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box">
+                    <strong>Note:</strong> The maximum funding approval is $1,000. If your total exceeds this amount, you'll need to adjust your anticipated expenses.
+                </div>
+            </div>
+
+            <!-- Digital Signature -->
+            <div class="section">
+                <h2 class="section-title">Faculty Signature</h2>
+                
+                <div class="form-group">
+                    <label for="facultySignature">Digital Signature <span class="required">*</span></label>
+                    <input type="text" id="facultySignature" name="facultySignature" placeholder="Type your full name as your digital signature" required>
+                    <small>By typing your name above, you are providing your legal digital signature and certifying that all information provided is accurate.</small>
+                </div>
+            </div>
+
+            <!-- Agreement and Submit -->
+            <div class="submit-section">
+                <div class="agreement-checkbox">
+                    <input type="checkbox" id="agreeCheckbox" required>
+                    <label for="agreeCheckbox">
+                        <strong>I certify that:</strong> All information provided in this request is accurate and complete. I understand that this request is subject to approval by my Department Chair and the Provost's Office. I agree to submit reimbursement requests within one month after completion of approved activities, and no later than June 30 for activities completed in the current fiscal year.
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Submit Request</button>
+            </div>
+        </form>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 13px;">
+            <p><strong>For Reimbursement:</strong> After your activity is completed, submit actual expenses along with receipts and mileage maps within one month (or by June 30 for same-year activities).</p>
+            <p style="margin-top: 10px;">Questions? Contact the Provost's Office at Muskingum University.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - UPDATE THIS URL WITH YOUR POWER AUTOMATE FLOW URL
+        const FLOW_URL = 'YOUR_POWER_AUTOMATE_FLOW_URL_HERE';
+
+        // Auto-calculate total anticipated expenses
+        const expenseInputs = document.querySelectorAll('.expense-input');
+        expenseInputs.forEach(input => {
+            input.addEventListener('input', calculateTotal);
+        });
+
+        function calculateTotal() {
+            let total = 0;
+            expenseInputs.forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+
+            const totalElement = document.getElementById('totalAnticipated');
+            totalElement.textContent = `$${total.toFixed(2)}`;
+
+            // Warn if over $1,000
+            if (total > 1000) {
+                totalElement.style.color = '#dc3545';
+                showMessage('error', 'Warning: Total anticipated expenses exceed the $1,000 maximum. Please adjust your expenses.');
+            } else {
+                totalElement.style.color = '#DB0A5B';
+                const messageDiv = document.getElementById('messageDiv');
+                if (messageDiv.classList.contains('error') && messageDiv.textContent.includes('exceed')) {
+                    messageDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Enable "Other" activity description field only when checked
+        document.getElementById('otherActivityCheckbox').addEventListener('change', function() {
+            document.getElementById('otherActivityDesc').disabled = !this.checked;
+            if (!this.checked) {
+                document.getElementById('otherActivityDesc').value = '';
+            }
+        });
+
+        // Set today's date as default
+        document.getElementById('submissionDate').valueAsDate = new Date();
+
+        // Form submission
+        document.getElementById('developmentFundForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Validate at least one eligible activity is checked
+            const eligibleActivities = document.querySelectorAll('input[name="eligibleActivities"]:checked');
+            if (eligibleActivities.length === 0) {
+                showMessage('error', 'Please select at least one eligible activity.');
+                return;
+            }
+
+            // Validate total doesn't exceed $1,000
+            const total = calculateTotalValue();
+            if (total > 1000) {
+                showMessage('error', 'Total anticipated expenses cannot exceed $1,000. Please adjust your expenses before submitting.');
+                return;
+            }
+
+            // Validate agreement checkbox
+            if (!document.getElementById('agreeCheckbox').checked) {
+                showMessage('error', 'Please check the certification agreement before submitting.');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const formData = new FormData(e.target);
+                
+                // Collect checked eligible activities
+                const selectedActivities = Array.from(eligibleActivities).map(cb => cb.value);
+                if (document.getElementById('otherActivityCheckbox').checked && formData.get('otherActivityDesc')) {
+                    selectedActivities[selectedActivities.indexOf('Other')] = `Other: ${formData.get('otherActivityDesc')}`;
+                }
+
+                // Build expense breakdown
+                const expenses = {
+                    membershipDues: parseFloat(formData.get('membershipDues')) || 0,
+                    airTravel: parseFloat(formData.get('airTravel')) || 0,
+                    mileage: parseFloat(formData.get('mileage')) || 0,
+                    groundTravel: parseFloat(formData.get('groundTravel')) || 0,
+                    registrationCosts: parseFloat(formData.get('registrationCosts')) || 0,
+                    lodging: parseFloat(formData.get('lodging')) || 0,
+                    mealsIncidentals: parseFloat(formData.get('mealsIncidentals')) || 0,
+                    otherExpense: parseFloat(formData.get('otherExpense')) || 0,
+                    otherExpenseDesc: formData.get('otherExpenseDesc') || '',
+                    total: total
+                };
+
+                // Build payload for Power Automate
+                const payload = {
+                    facultyName: formData.get('facultyName'),
+                    department: formData.get('department'),
+                    submissionDate: formData.get('submissionDate'),
+                    eligibleActivities: selectedActivities.join('; '),
+                    activityDescription: formData.get('activityDescription'),
+                    professionalValue: formData.get('professionalValue'),
+                    classArrangements: formData.get('classArrangements') || 'N/A',
+                    expenses: expenses,
+                    facultySignature: formData.get('facultySignature'),
+                    submittedAt: new Date().toISOString()
+                };
+
+                // Send to Power Automate
+                const response = await axios.post(FLOW_URL, payload, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                showMessage('success', 'Your Faculty Development Fund request has been submitted successfully! You will receive a confirmation email shortly.');
+                e.target.reset();
+                document.getElementById('submissionDate').valueAsDate = new Date();
+                calculateTotal();
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                showMessage('error', 'There was an error submitting your request. Please try again or contact IT support if the problem persists.');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        function calculateTotalValue() {
+            let total = 0;
+            expenseInputs.forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            return total;
+        }
+
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('messageDiv');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 8000);
+            }
+
+            // Scroll to message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
+            document.getElementById('submitBtn').disabled = show;
+        }
+    </script>
+</body>
+</html>
