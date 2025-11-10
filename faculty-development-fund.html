@@ -102,6 +102,43 @@
             resize: vertical;
         }
 
+        /* Remove spinner arrows from number inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #DB0A5B;
+        }
+
+        .mileage-miles-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e1e1e1;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+        }
+
+        .mileage-miles-input:focus {
+            outline: none;
+            border-color: #DB0A5B;
+        }
+
         .checkbox-group {
             display: flex;
             flex-direction: column;
@@ -349,6 +386,15 @@
         <div class="header">
             <h1>Faculty Professional Development Funding and Reimbursement Request</h1>
             <p>Muskingum University</p>
+            <p style="font-style: italic; font-weight: bold; color: #666; margin-top: 5px;">Investing in your professional development</p>
+        </div>
+
+        <!-- Policy Document Link -->
+        <div style="text-align: center; margin: 20px 0 30px 0; padding: 15px; background-color: #f0f0f0; border-radius: 8px; border-left: 4px solid #DB0A5B;">
+            <p style="margin: 0; font-size: 16px;">
+                📄 <a href="Faculty professional development policy 11.7.25.docx" target="_blank" style="color: #DB0A5B; font-weight: bold; text-decoration: none; border-bottom: 2px solid #DB0A5B; padding-bottom: 2px;">Faculty Professional Policy</a>
+            </p>
+            <p style="margin: 8px 0 0 0; font-size: 13px; color: #666;">Review the complete policy before submitting your request</p>
         </div>
 
         <div id="messageDiv" class="message"></div>
@@ -479,8 +525,20 @@
                             </tr>
                             <tr>
                                 <td>Mileage <small>($0.70 per mile)</small></td>
-                                <td><input type="number" step="0.01" min="0" id="mileage" name="mileage" placeholder="0.00" class="expense-input-anticipated"></td>
-                                <td><input type="number" step="0.01" min="0" id="mileageActual" name="mileageActual" placeholder="0.00" class="expense-input-actual"></td>
+                                <td>
+                                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                                        <input type="number" step="1" min="0" id="mileageAnticipatedMiles" name="mileageAnticipatedMiles" placeholder="Enter miles" class="mileage-miles-input">
+                                        <small style="color: #DB0A5B; font-weight: bold;">= $<span id="mileageAnticipatedCalc">0.00</span></small>
+                                        <input type="hidden" id="mileage" name="mileage" class="expense-input-anticipated">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                                        <input type="number" step="1" min="0" id="mileageActualMiles" name="mileageActualMiles" placeholder="Enter miles" class="mileage-miles-input">
+                                        <small style="color: #DB0A5B; font-weight: bold;">= $<span id="mileageActualCalc">0.00</span></small>
+                                        <input type="hidden" id="mileageActual" name="mileageActual" class="expense-input-actual">
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Other Ground Travel</td>
@@ -527,7 +585,7 @@
                     </ul>
                     
                     <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ffc107;">
-                        <p style="margin-bottom: 10px;"><strong>Request for Funding Reimbursement</strong></p>
+                        <p style="margin-bottom: 10px;"><strong>A. Request for Funding Reimbursement</strong></p>
                         <p style="margin-bottom: 10px;">Complete the "actual expense" column above.</p>
                         <p style="margin-bottom: 0;"><strong>Note:</strong> Receipts and mileage maps must be attached for reimbursement. The request for funding reimbursement must be submitted within one month after completion of the approved activities. June reimbursement requests must be submitted by June 30, i.e., the end of the fiscal year in which the activity took place. Currently, only physical receipts are accepted for reimbursement.</p>
                     </div>
@@ -573,6 +631,28 @@
         
         actualInputs.forEach(input => {
             input.addEventListener('input', calculateTotals);
+        });
+
+        // Mileage calculation - convert miles to dollars
+        const MILEAGE_RATE = 0.70;
+        
+        const mileageAnticipatedMilesInput = document.getElementById('mileageAnticipatedMiles');
+        const mileageActualMilesInput = document.getElementById('mileageActualMiles');
+        
+        mileageAnticipatedMilesInput.addEventListener('input', function() {
+            const miles = parseFloat(this.value) || 0;
+            const dollars = miles * MILEAGE_RATE;
+            document.getElementById('mileageAnticipatedCalc').textContent = dollars.toFixed(2);
+            document.getElementById('mileage').value = dollars.toFixed(2);
+            calculateTotals();
+        });
+        
+        mileageActualMilesInput.addEventListener('input', function() {
+            const miles = parseFloat(this.value) || 0;
+            const dollars = miles * MILEAGE_RATE;
+            document.getElementById('mileageActualCalc').textContent = dollars.toFixed(2);
+            document.getElementById('mileageActual').value = dollars.toFixed(2);
+            calculateTotals();
         });
 
         function calculateTotals() {
@@ -667,6 +747,7 @@
                     membershipDues: parseFloat(formData.get('membershipDues')) || 0,
                     airTravel: parseFloat(formData.get('airTravel')) || 0,
                     mileage: parseFloat(formData.get('mileage')) || 0,
+                    mileageMiles: parseFloat(formData.get('mileageAnticipatedMiles')) || 0,
                     groundTravel: parseFloat(formData.get('groundTravel')) || 0,
                     registrationCosts: parseFloat(formData.get('registrationCosts')) || 0,
                     lodging: parseFloat(formData.get('lodging')) || 0,
@@ -682,6 +763,7 @@
                     membershipDues: parseFloat(formData.get('membershipDuesActual')) || 0,
                     airTravel: parseFloat(formData.get('airTravelActual')) || 0,
                     mileage: parseFloat(formData.get('mileageActual')) || 0,
+                    mileageMiles: parseFloat(formData.get('mileageActualMiles')) || 0,
                     groundTravel: parseFloat(formData.get('groundTravelActual')) || 0,
                     registrationCosts: parseFloat(formData.get('registrationCostsActual')) || 0,
                     lodging: parseFloat(formData.get('lodgingActual')) || 0,
