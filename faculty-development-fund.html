@@ -625,16 +625,14 @@
             document.getElementById('loading').style.display = 'block';
             
             // Gather form data using PascalCase to match SharePoint columns
-            // Convert date to ISO format for SharePoint
-            const submissionDateValue = document.getElementById('submissionDate').value;
-            const submissionDateISO = new Date(submissionDateValue + 'T00:00:00').toISOString();
+            // NOTE: SubmissionDate is NOT sent from form - Power Automate will use utcNow()
             
             const formData = {
                 FacultyName: document.getElementById('facultyName').value,
                 FacultyEmail: document.getElementById('facultyEmail').value,
                 Department: document.getElementById('department').value,
                 ChairEmail: chairEmail,
-                SubmissionDate: submissionDateISO,
+                // SubmissionDate removed - will be set by Power Automate using utcNow()
                 EligibleActivities: document.getElementById('eligibleActivities').value,
                 ActivityDescription: document.getElementById('activityDescription').value,
                 ProfessionalValue: document.getElementById('professionalValue').value,
