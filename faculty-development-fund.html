@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         // SharePoint Configuration - UPDATE THIS WITH YOUR SITE URL
-        const SHAREPOINT_SITE_URL = 'https://muskingum.sharepoint.com/sites/aa_academicaffairs-public/Lists/Department%20Chair/AllItems.aspx';
+        const SHAREPOINT_SITE_URL = 'https://muskingum.sharepoint.com/sites/YourSiteName';
         const DEPT_CHAIRS_LIST = 'Department Chairs';
         
         // Mileage rate
@@ -542,27 +542,29 @@
                 
                 // Fallback: Show static list of departments
                 const fallbackDepts = [
-                    {Name: "Amanda Adams", email: "aeadams@muskingum.edu"},
-                    {Name: "Brian Bergstrom", email: "brianb@muskingum.edu"},
-                    {Name: "Cassie King", email: "caking@muskingum.edu"},
-                    {Name: "Colleen Stevenson", email: "colleens@muskingum.edu"},
-                    {Name: "Daniel Strycha", email: "dstrycha@muskingum.edu"},
-                    {Name: "Hallie Baker", email: "hallieb@muskingum.edu"},
-                    {Name: "Jason Kehrberg", email: "jasonk@muskingum.edu"},
-                    {Name: "Jean-Francois Mondon", email: "jmondon@muskingum.edu"},
-                    {Name: "Jim Dooley", email: "jdooley@muskingum.edu"},
-                    {Name: "Joe Shaffer", email: "shaeffer@muskingum.edu"},
-                    {Name: "Keith Eberly", email: "keberly@muskingum.edu"},
-                    {Name: "Laura Geiger", email: "lgeiger@muskingum.edu"},
-                    {Name: "Lois Zook", email: "lzook@muskingum.edu"},
-                    {Name: "Melissa Conroy", email: "mconroy@muskingum.edu"},
-                    {Name: "Richard Daquila", email: "rdaquila@muskingum.edu"},
-                    {Name: "Richard Taylor", email: "richardt@muskingum.edu},
-                    {Name: "Rob Sharp", email: "rsharp@muskingum.edu"},
-                    {Name: "Seth Barret", email: "sbarrett@muskingum.edu"},
-                    {Name: "Tiffany Lough", email: "tiffanyf@muskingum.edu"},
-                    {Name: "Tom German", email: "tgerman@muskingum.edu"},
-                    {Name: "Tom McGrath", email: "tmcgrath@muskingum.edu"}
+                    {dept: "Art", email: "jdrubel@muskingum.edu"},
+                    {dept: "Biology", email: "sallen@muskingum.edu"},
+                    {dept: "Chemistry", email: "sbarrett@muskingum.edu"},
+                    {dept: "Communication, Media, & Theatre", email: "tcaudill@muskingum.edu"},
+                    {dept: "Computer Science", email: "rtaylor@muskingum.edu"},
+                    {dept: "Economics, Accounting, & Business", email: "lgeiger@muskingum.edu"},
+                    {dept: "Education", email: "keberly@muskingum.edu"},
+                    {dept: "Education (Graduate)", email: "jgrubaugh@muskingum.edu"},
+                    {dept: "English", email: "aadams@muskingum.edu"},
+                    {dept: "Exercise & Health Sciences", email: "dbennett@muskingum.edu"},
+                    {dept: "History", email: "ahattingh@muskingum.edu"},
+                    {dept: "Leadership (Graduate)", email: "rmcmanus@muskingum.edu"},
+                    {dept: "Library", email: "nhouston@muskingum.edu"},
+                    {dept: "Mathematics", email: "mdavis@muskingum.edu"},
+                    {dept: "Music", email: "dstrychacz@muskingum.edu"},
+                    {dept: "Nursing", email: "tarmstead@muskingum.edu"},
+                    {dept: "Occupational Therapy (Graduate)", email: "hcoalt@muskingum.edu"},
+                    {dept: "Physics & Engineering", email: "ysong@muskingum.edu"},
+                    {dept: "Political Science & Criminal Justice", email: "rarnold@muskingum.edu"},
+                    {dept: "Psychology", email: "dmeyer@muskingum.edu"},
+                    {dept: "Religion & Philosophy", email: "mconroy@muskingum.edu"},
+                    {dept: "Sociology & Public Health Studies", email: "hbaker@muskingum.edu"},
+                    {dept: "World Languages", email: "chernandez@muskingum.edu"}
                 ];
 
                 const departmentSelect = document.getElementById('department');
@@ -721,7 +723,7 @@
             
             try {
                 // UPDATE THIS WITH YOUR POWER AUTOMATE FLOW URL
-                const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a149a0856a644843b2a5369bc1807d9d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=u-LWmXxDP-pzboBUTJnVDczE5ATL5Xu_-LC0_yj6pP0';
+                const flowUrl = 'YOUR_POWER_AUTOMATE_URL_HERE';
                 
                 const response = await axios.post(flowUrl, formData);
                 
