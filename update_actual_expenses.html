@@ -99,6 +99,17 @@
             border-color: #DB0A5B;
         }
 
+        /* Hide spinner arrows on number inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
         .required {
             color: #DB0A5B;
         }
@@ -334,12 +345,12 @@
                             <tr>
                                 <td>Membership Dues</td>
                                 <td><span id="anticipated-membershipDues" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="membershipDuesActual" name="membershipDuesActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="membershipDuesActual" name="membershipDuesActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr>
                                 <td>Air Travel</td>
                                 <td><span id="anticipated-airTravel" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="airTravelActual" name="airTravelActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="airTravelActual" name="airTravelActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr>
                                 <td>Mileage <small>($0.70 per mile)</small></td>
@@ -349,36 +360,36 @@
                                 </td>
                                 <td>
                                     <div style="display: flex; flex-direction: column; gap: 5px;">
-                                        <input type="number" step="1" min="0" id="mileageActualMiles" name="mileageActualMiles" placeholder="Enter miles" class="mileage-miles-input" required>
+                                        <input type="number" step="1" min="0" id="mileageActualMiles" name="mileageActualMiles" placeholder="Enter miles" value="0">
                                         <div class="calculated-amount">= $<span id="mileageActualCalc">0.00</span></div>
-                                        <input type="hidden" id="mileageActual" name="mileageActual">
+                                        <input type="hidden" id="mileageActual" name="mileageActual" value="0">
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Ground Travel</td>
                                 <td><span id="anticipated-groundTravel" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="groundTravelActual" name="groundTravelActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="groundTravelActual" name="groundTravelActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr>
                                 <td>Registration Costs</td>
                                 <td><span id="anticipated-registrationCosts" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="registrationCostsActual" name="registrationCostsActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="registrationCostsActual" name="registrationCostsActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr>
                                 <td>Lodging</td>
                                 <td><span id="anticipated-lodging" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="lodgingActual" name="lodgingActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="lodgingActual" name="lodgingActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr>
                                 <td>Meals & Incidentals</td>
                                 <td><span id="anticipated-mealsIncidentals" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="mealsIncidentalsActual" name="mealsIncidentalsActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="mealsIncidentalsActual" name="mealsIncidentalsActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr>
                                 <td>Other Expenses</td>
                                 <td><span id="anticipated-otherExpense" class="anticipated-value">$0.00</span></td>
-                                <td><input type="number" step="0.01" min="0" id="otherExpenseActual" name="otherExpenseActual" placeholder="0.00" required></td>
+                                <td><input type="number" step="0.01" min="0" id="otherExpenseActual" name="otherExpenseActual" placeholder="0.00" value="0"></td>
                             </tr>
                             <tr class="total-row">
                                 <td>TOTAL</td>
