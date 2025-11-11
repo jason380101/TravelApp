@@ -625,12 +625,16 @@
             document.getElementById('loading').style.display = 'block';
             
             // Gather form data using PascalCase to match SharePoint columns
+            // Convert date to ISO format for SharePoint
+            const submissionDateValue = document.getElementById('submissionDate').value;
+            const submissionDateISO = new Date(submissionDateValue + 'T00:00:00').toISOString();
+            
             const formData = {
                 FacultyName: document.getElementById('facultyName').value,
                 FacultyEmail: document.getElementById('facultyEmail').value,
                 Department: document.getElementById('department').value,
                 ChairEmail: chairEmail,
-                SubmissionDate: document.getElementById('submissionDate').value,
+                SubmissionDate: submissionDateISO,
                 EligibleActivities: document.getElementById('eligibleActivities').value,
                 ActivityDescription: document.getElementById('activityDescription').value,
                 ProfessionalValue: document.getElementById('professionalValue').value,
