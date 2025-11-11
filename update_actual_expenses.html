@@ -3,30 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Actual Expenses - Muskingum University</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        // Mileage rate
-        const MILEAGE_RATE = 0.70;
-    </script>
+    <title>Update Actual Expenses - Faculty Development Fund</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Calibri, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Calibri, Arial, sans-serif;
             background-color: #f5f5f5;
             padding: 20px;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            background-color: white;
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -34,20 +29,15 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #DB0A5B;
+            margin-bottom: 40px;
             padding-bottom: 20px;
+            border-bottom: 3px solid #DB0A5B;
         }
 
         .header h1 {
             color: #DB0A5B;
             font-size: 28px;
             margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 16px;
         }
 
         .section {
@@ -57,70 +47,60 @@
         .section-title {
             color: #DB0A5B;
             font-size: 20px;
-            font-weight: bold;
             margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #DB0A5B;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e1e1;
+        }
+
+        .info-box {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 4px solid #DB0A5B;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            margin-bottom: 10px;
+        }
+
+        .info-box strong {
+            color: #333;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: #333;
-        }
-
-        .required {
-            color: #DB0A5B;
+            font-weight: bold;
         }
 
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        select,
+        textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e1e1;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
             font-family: Calibri, sans-serif;
-            transition: border-color 0.3s;
         }
 
-        /* Remove spinner arrows from number inputs */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
-        input:focus {
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #DB0A5B;
         }
 
-        input:disabled {
-            background-color: #f5f5f5;
-            cursor: not-allowed;
-        }
-
-        .info-box {
-            background-color: #f0f8ff;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-
-        .info-box h3 {
-            color: #2196F3;
-            margin-bottom: 10px;
+        .required {
+            color: #DB0A5B;
         }
 
         .expense-table {
@@ -129,28 +109,28 @@
             margin-top: 15px;
         }
 
+        .expense-table th,
+        .expense-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
         .expense-table th {
             background-color: #DB0A5B;
             color: white;
-            padding: 12px;
-            text-align: left;
             font-weight: bold;
-        }
-
-        .expense-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-
-        .expense-table input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
 
         .expense-table tr:nth-child(even) {
             background-color: #f9f9f9;
+        }
+
+        .expense-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         .total-row {
@@ -159,31 +139,23 @@
         }
 
         .total-row td {
-            border-top: 2px solid #DB0A5B;
-            padding: 15px 10px;
-        }
-
-        .anticipated-value {
-            color: #666;
-            font-weight: bold;
+            font-size: 16px;
         }
 
         .button {
             background-color: #DB0A5B;
             color: white;
-            padding: 15px 40px;
+            padding: 12px 30px;
             border: none;
             border-radius: 4px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s;
-            display: block;
-            margin: 30px auto 0;
         }
 
         .button:hover {
-            background-color: #B00850;
+            background-color: #b00848;
         }
 
         .button:disabled {
@@ -192,18 +164,27 @@
         }
 
         .button-secondary {
-            background-color: #2196F3;
-            margin: 10px auto;
+            background-color: #666;
         }
 
         .button-secondary:hover {
-            background-color: #1976D2;
+            background-color: #555;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
         }
 
         .loading {
             display: none;
             text-align: center;
-            margin-top: 20px;
+            padding: 20px;
         }
 
         .loading-spinner {
@@ -213,23 +194,12 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        .success-message {
-            color: #008000;
-            font-weight: bold;
-            margin-top: 10px;
-            padding: 15px;
-            background-color: #e6ffe6;
-            border-radius: 4px;
-            display: none;
-            text-align: center;
         }
 
         .error-message {
@@ -260,6 +230,13 @@
             font-weight: bold;
             font-size: 14px;
             margin-top: 5px;
+        }
+
+        .anticipated-value {
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
         @media (max-width: 768px) {
@@ -348,238 +325,257 @@
                     <table class="expense-table">
                         <thead>
                             <tr>
-                                <th>Expense Category</th>
+                                <th>Category</th>
                                 <th>Anticipated</th>
-                                <th>Actual</th>
+                                <th>Actual <span class="required">*</span></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Membership Dues</td>
-                                <td class="anticipated-value" id="antiMembershipDues">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="membershipDuesActual" value="0" class="expense-input-actual"></td>
+                                <td><span id="anticipated-membershipDues" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="membershipDuesActual" name="membershipDuesActual" placeholder="0.00" required></td>
                             </tr>
                             <tr>
                                 <td>Air Travel</td>
-                                <td class="anticipated-value" id="antiAirTravel">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="airTravelActual" value="0" class="expense-input-actual"></td>
+                                <td><span id="anticipated-airTravel" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="airTravelActual" name="airTravelActual" placeholder="0.00" required></td>
                             </tr>
                             <tr>
                                 <td>Mileage <small>($0.70 per mile)</small></td>
-                                <td class="anticipated-value" id="antiMileage">$0 (0 miles)</td>
+                                <td>
+                                    <span id="anticipated-mileage" class="anticipated-value">$0.00</span>
+                                    <small id="anticipated-mileageMiles" style="display: block; margin-top: 5px; color: #666;"></small>
+                                </td>
                                 <td>
                                     <div style="display: flex; flex-direction: column; gap: 5px;">
-                                        <input type="number" step="1" min="0" id="mileageActualMiles" value="0" placeholder="Enter miles" class="mileage-miles-input">
+                                        <input type="number" step="1" min="0" id="mileageActualMiles" name="mileageActualMiles" placeholder="Enter miles" class="mileage-miles-input" required>
                                         <div class="calculated-amount">= $<span id="mileageActualCalc">0.00</span></div>
-                                        <input type="hidden" id="mileageActual" value="0" class="expense-input-actual">
+                                        <input type="hidden" id="mileageActual" name="mileageActual">
                                     </div>
                                 </td>
                             </tr>
                             <tr>
-                                <td>Other Ground Travel</td>
-                                <td class="anticipated-value" id="antiGroundTravel">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="groundTravelActual" value="0" class="expense-input-actual"></td>
+                                <td>Ground Travel</td>
+                                <td><span id="anticipated-groundTravel" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="groundTravelActual" name="groundTravelActual" placeholder="0.00" required></td>
                             </tr>
                             <tr>
                                 <td>Registration Costs</td>
-                                <td class="anticipated-value" id="antiRegistrationCosts">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="registrationCostsActual" value="0" class="expense-input-actual"></td>
+                                <td><span id="anticipated-registrationCosts" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="registrationCostsActual" name="registrationCostsActual" placeholder="0.00" required></td>
                             </tr>
                             <tr>
                                 <td>Lodging</td>
-                                <td class="anticipated-value" id="antiLodging">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="lodgingActual" value="0" class="expense-input-actual"></td>
+                                <td><span id="anticipated-lodging" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="lodgingActual" name="lodgingActual" placeholder="0.00" required></td>
                             </tr>
                             <tr>
                                 <td>Meals & Incidentals</td>
-                                <td class="anticipated-value" id="antiMealsIncidentals">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="mealsIncidentalsActual" value="0" class="expense-input-actual"></td>
+                                <td><span id="anticipated-mealsIncidentals" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="mealsIncidentalsActual" name="mealsIncidentalsActual" placeholder="0.00" required></td>
                             </tr>
                             <tr>
-                                <td>Other Expense</td>
-                                <td class="anticipated-value" id="antiOtherExpense">$0</td>
-                                <td><input type="number" step="0.01" min="0" id="otherExpenseActual" value="0" class="expense-input-actual"></td>
+                                <td>Other Expenses</td>
+                                <td><span id="anticipated-otherExpense" class="anticipated-value">$0.00</span></td>
+                                <td><input type="number" step="0.01" min="0" id="otherExpenseActual" name="otherExpenseActual" placeholder="0.00" required></td>
                             </tr>
                             <tr class="total-row">
-                                <td><strong>TOTAL</strong></td>
-                                <td class="anticipated-value" id="antiTotalAnticipated">$0</td>
-                                <td><strong>$<span id="totalActual">0.00</span></strong></td>
+                                <td>TOTAL</td>
+                                <td><span id="anticipated-total">$0.00</span></td>
+                                <td><strong>$<span id="actualTotal">0.00</span></strong></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Hidden Fields -->
-                <input type="hidden" id="sharePointItemId" name="sharePointItemId">
+                <input type="hidden" id="recordId" name="recordId">
                 <input type="hidden" id="requestId" name="requestId">
+                <input type="hidden" id="totalActual" name="totalActual">
 
                 <!-- Submit Button -->
-                <button type="submit" class="button" id="submitBtn">Submit Actual Expenses</button>
-
-                <!-- Loading indicator -->
-                <div class="loading" id="loadingSubmit">
-                    <div class="loading-spinner"></div>
-                    <p>Updating your expenses...</p>
+                <div style="margin-top: 30px; text-align: center;">
+                    <button type="submit" class="button" id="submitBtn">
+                        Submit Actual Expenses
+                    </button>
                 </div>
 
-                <!-- Success/Error messages -->
-                <div class="success-message" id="successMessage"></div>
-                <div class="error-message" id="errorMessage"></div>
+                <div class="loading" id="loadingSubmit">
+                    <div class="loading-spinner"></div>
+                    <p>Submitting your expenses...</p>
+                </div>
 
+                <div class="success-message" id="successMessage">
+                    <strong>Success!</strong> Your actual expenses have been updated.
+                    <p style="margin-top: 10px;">You will receive a confirmation email shortly.</p>
+                </div>
+
+                <div class="error-message" id="errorMessageSubmit"></div>
             </form>
         </div>
     </div>
 
     <script>
-        // SharePoint configuration
-        const SHAREPOINT_SITE = 'https://muskingum.sharepoint.com/sites/aa_academicaffairs-public';
-        const SHAREPOINT_LIST = 'Faculty Development Fund Requests';
+        const MILEAGE_RATE = 0.70;
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeMileageCalculator();
-            initializeExpenseCalculator();
-        });
-
-        // Initialize mileage calculator
-        function initializeMileageCalculator() {
-            const mileageActualInput = document.getElementById('mileageActualMiles');
-            
-            mileageActualInput.addEventListener('input', function() {
-                const miles = parseFloat(this.value) || 0;
-                const dollars = miles * MILEAGE_RATE;
-                document.getElementById('mileageActualCalc').textContent = dollars.toFixed(2);
-                document.getElementById('mileageActual').value = dollars.toFixed(2);
-                calculateTotals();
-            });
+        // Show/hide loading spinner
+        function showLoading(elementId) {
+            document.getElementById(elementId).style.display = 'block';
         }
 
-        // Initialize expense calculator
-        function initializeExpenseCalculator() {
-            const actualInputs = document.querySelectorAll('.expense-input-actual');
-            
-            actualInputs.forEach(input => {
-                input.addEventListener('input', calculateTotals);
-            });
+        function hideLoading(elementId) {
+            document.getElementById(elementId).style.display = 'none';
         }
 
-        // Calculate totals
-        function calculateTotals() {
-            const actualInputs = document.querySelectorAll('.expense-input-actual');
-            let actualTotal = 0;
-            
-            actualInputs.forEach(input => {
-                actualTotal += parseFloat(input.value) || 0;
-            });
-            
-            document.getElementById('totalActual').textContent = actualTotal.toFixed(2);
+        // Show/hide error messages
+        function showError(message, elementId) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
 
-        // Load request from SharePoint
+        function hideError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        // Load Request Function
         async function loadRequest() {
-        const requestId = document.getElementById('requestIdLookup').value.trim();
-    
-        if (!requestId) {
-            showError('Please enter a Request ID', 'errorMessageLookup');
-            return;
-
-        const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1';  // ← PASTE HERE
-    }
-
-    showLoading('loadingLookup');
-    hideError('errorMessageLookup');
-
-    const flowUrl = 'PASTE_YOUR_ACTUAL_FLOW_URL_HERE';  // ← PASTE HERE
+            const requestId = document.getElementById('requestIdLookup').value.trim();
+            
+            if (!requestId) {
+                showError('Please enter a Request ID', 'errorMessageLookup');
+                return;
             }
 
-            // Show loading
-            document.getElementById('loadRequestBtn').disabled = true;
-            document.getElementById('loadingLookup').style.display = 'block';
-            document.getElementById('errorMessageLookup').style.display = 'none';
+            showLoading('loadingLookup');
+            hideError('errorMessageLookup');
+
+            // LOOKUP FLOW URL - This flow retrieves the request by ID
+            const lookupFlowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1';
 
             try {
-                // Call Power Automate flow to fetch the SharePoint item
-                const flowUrl = 'YOUR_LOOKUP_FLOW_URL_HERE'; // You'll need to create this flow
-                
-                const response = await axios.post(flowUrl, {
-                    RequestID: requestId
+                const response = await fetch(lookupFlowUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        RequestID: requestId
+                    })
                 });
 
-                if (response.data && response.data.found) {
-                    // Populate the form with the data
-                    populateForm(response.data);
-                    
-                    // Hide lookup section, show update section
-                    document.getElementById('lookupSection').style.display = 'none';
-                    document.getElementById('updateSection').style.display = 'block';
-                } else {
-                    showError('errorMessageLookup', 'Request ID not found. Please check and try again.');
+                hideLoading('loadingLookup');
+
+                if (!response.ok) {
+                    throw new Error(`Request failed: ${response.status}`);
                 }
 
+                const data = await response.json();
+
+                if (data.success === false || !data.ID) {
+                    showError('Request ID not found. Please check your Request ID and try again.', 'errorMessageLookup');
+                    return;
+                }
+
+                // Populate form with data
+                populateForm(data);
+                
+                // Hide lookup section, show update section
+                document.getElementById('lookupSection').style.display = 'none';
+                document.getElementById('updateSection').style.display = 'block';
+
             } catch (error) {
-                console.error('Lookup error:', error);
-                showError('errorMessageLookup', 'Failed to load request. Please try again or contact IT support.');
-            } finally {
-                document.getElementById('loadRequestBtn').disabled = false;
-                document.getElementById('loadingLookup').style.display = 'none';
+                hideLoading('loadingLookup');
+                showError('Error loading request: ' + error.message, 'errorMessageLookup');
             }
         }
 
-        // Populate form with SharePoint data
+        // Populate Form with Retrieved Data
         function populateForm(data) {
-            // Store item ID for update
-            document.getElementById('sharePointItemId').value = data.ID;
-            document.getElementById('requestId').value = data.RequestID;
+            // Set request information
+            document.getElementById('displayRequestId').textContent = data.RequestID || '';
+            document.getElementById('displayFacultyName').textContent = data.FacultyName || '';
+            document.getElementById('displayDepartment').textContent = data.Department || '';
+            document.getElementById('displayActivity').textContent = data.EligibleActivities || '';
 
-            // Display request info
-            document.getElementById('displayRequestId').textContent = data.RequestID;
-            document.getElementById('displayFacultyName').textContent = data.FacultyName;
-            document.getElementById('displayDepartment').textContent = data.Department;
-            document.getElementById('displayActivity').textContent = data.ActivityDescription;
+            // Set hidden fields
+            document.getElementById('recordId').value = data.ID || '';
+            document.getElementById('requestId').value = data.RequestID || '';
 
-            // Populate anticipated values
-            document.getElementById('antiMembershipDues').textContent = '$' + (data.MembershipDues || 0);
-            document.getElementById('antiAirTravel').textContent = '$' + (data.AirTravel || 0);
-            document.getElementById('antiMileage').textContent = '$' + (data.Mileage || 0) + ' (' + (data.MileageMiles || 0) + ' miles)';
-            document.getElementById('antiGroundTravel').textContent = '$' + (data.GroundTravel || 0);
-            document.getElementById('antiRegistrationCosts').textContent = '$' + (data.RegistrationCosts || 0);
-            document.getElementById('antiLodging').textContent = '$' + (data.Lodging || 0);
-            document.getElementById('antiMealsIncidentals').textContent = '$' + (data.MealsIncidentals || 0);
-            document.getElementById('antiOtherExpense').textContent = '$' + (data.OtherExpense || 0);
-            document.getElementById('antiTotalAnticipated').textContent = '$' + (data.TotalAnticipated || 0);
+            // Populate anticipated expenses
+            document.getElementById('anticipated-membershipDues').textContent = '$' + parseFloat(data.MembershipDues || 0).toFixed(2);
+            document.getElementById('anticipated-airTravel').textContent = '$' + parseFloat(data.AirTravel || 0).toFixed(2);
+            document.getElementById('anticipated-mileage').textContent = '$' + parseFloat(data.Mileage || 0).toFixed(2);
+            document.getElementById('anticipated-groundTravel').textContent = '$' + parseFloat(data.GroundTravel || 0).toFixed(2);
+            document.getElementById('anticipated-registrationCosts').textContent = '$' + parseFloat(data.RegistrationCosts || 0).toFixed(2);
+            document.getElementById('anticipated-lodging').textContent = '$' + parseFloat(data.Lodging || 0).toFixed(2);
+            document.getElementById('anticipated-mealsIncidentals').textContent = '$' + parseFloat(data.MealsIncidentals || 0).toFixed(2);
+            document.getElementById('anticipated-otherExpense').textContent = '$' + parseFloat(data.OtherExpense || 0).toFixed(2);
+            
+            // Show anticipated miles if available
+            if (data.MileageMiles && data.MileageMiles > 0) {
+                document.getElementById('anticipated-mileageMiles').textContent = '(' + data.MileageMiles + ' miles)';
+            }
 
-            // Pre-fill actual values if they exist
-            document.getElementById('membershipDuesActual').value = data.MembershipDuesActual || 0;
-            document.getElementById('airTravelActual').value = data.AirTravelActual || 0;
-            document.getElementById('mileageActualMiles').value = data.MileageActualMiles || 0;
-            document.getElementById('mileageActual').value = data.MileageActual || 0;
-            document.getElementById('groundTravelActual').value = data.GroundTravelActual || 0;
-            document.getElementById('registrationCostsActual').value = data.RegistrationCostsActual || 0;
-            document.getElementById('lodgingActual').value = data.LodgingActual || 0;
-            document.getElementById('mealsIncidentalsActual').value = data.MealsIncidentalsActual || 0;
-            document.getElementById('otherExpenseActual').value = data.OtherExpenseActual || 0;
-
-            // Trigger mileage calculation
-            const mileageEvent = new Event('input');
-            document.getElementById('mileageActualMiles').dispatchEvent(mileageEvent);
-
-            // Calculate totals
-            calculateTotals();
+            // Calculate and display anticipated total
+            const anticipatedTotal = 
+                parseFloat(data.MembershipDues || 0) +
+                parseFloat(data.AirTravel || 0) +
+                parseFloat(data.Mileage || 0) +
+                parseFloat(data.GroundTravel || 0) +
+                parseFloat(data.RegistrationCosts || 0) +
+                parseFloat(data.Lodging || 0) +
+                parseFloat(data.MealsIncidentals || 0) +
+                parseFloat(data.OtherExpense || 0);
+            
+            document.getElementById('anticipated-total').textContent = '$' + anticipatedTotal.toFixed(2);
         }
 
-        // Form submission
+        // Calculate Mileage
+        document.getElementById('mileageActualMiles').addEventListener('input', function() {
+            const miles = parseFloat(this.value) || 0;
+            const dollars = miles * MILEAGE_RATE;
+            document.getElementById('mileageActualCalc').textContent = dollars.toFixed(2);
+            document.getElementById('mileageActual').value = dollars.toFixed(2);
+            calculateActualTotal();
+        });
+
+        // Calculate Actual Total
+        function calculateActualTotal() {
+            const membershipDues = parseFloat(document.getElementById('membershipDuesActual').value) || 0;
+            const airTravel = parseFloat(document.getElementById('airTravelActual').value) || 0;
+            const mileage = parseFloat(document.getElementById('mileageActual').value) || 0;
+            const groundTravel = parseFloat(document.getElementById('groundTravelActual').value) || 0;
+            const registrationCosts = parseFloat(document.getElementById('registrationCostsActual').value) || 0;
+            const lodging = parseFloat(document.getElementById('lodgingActual').value) || 0;
+            const mealsIncidentals = parseFloat(document.getElementById('mealsIncidentalsActual').value) || 0;
+            const otherExpense = parseFloat(document.getElementById('otherExpenseActual').value) || 0;
+
+            const total = membershipDues + airTravel + mileage + groundTravel + registrationCosts + lodging + mealsIncidentals + otherExpense;
+            
+            document.getElementById('actualTotal').textContent = total.toFixed(2);
+            document.getElementById('totalActual').value = total.toFixed(2);
+        }
+
+        // Add event listeners to all actual expense inputs
+        document.querySelectorAll('#membershipDuesActual, #airTravelActual, #groundTravelActual, #registrationCostsActual, #lodgingActual, #mealsIncidentalsActual, #otherExpenseActual').forEach(input => {
+            input.addEventListener('input', calculateActualTotal);
+        });
+
+        // Submit Form
         document.getElementById('updateExpensesForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Show loading
+            showLoading('loadingSubmit');
+            hideError('errorMessageSubmit');
             document.getElementById('submitBtn').disabled = true;
-            document.getElementById('loadingSubmit').style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
 
-            // Gather actual expense data
-            const updateData = {
-                ID: document.getElementById('sharePointItemId').value,
+            // UPDATE FLOW URL - This flow updates the actual expenses
+            const updateFlowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1';
+
+            const payload = {
+                ID: document.getElementById('recordId').value,
                 RequestID: document.getElementById('requestId').value,
                 MembershipDuesActual: parseFloat(document.getElementById('membershipDuesActual').value) || 0,
                 AirTravelActual: parseFloat(document.getElementById('airTravelActual').value) || 0,
@@ -590,47 +586,42 @@
                 LodgingActual: parseFloat(document.getElementById('lodgingActual').value) || 0,
                 MealsIncidentalsActual: parseFloat(document.getElementById('mealsIncidentalsActual').value) || 0,
                 OtherExpenseActual: parseFloat(document.getElementById('otherExpenseActual').value) || 0,
-                TotalActual: parseFloat(document.getElementById('totalActual').textContent)
+                TotalActual: parseFloat(document.getElementById('totalActual').value) || 0
             };
 
             try {
-                // Call Power Automate flow to update SharePoint
-                const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1'; // You'll need to create this flow
-                
-                const response = await axios.post(flowUrl, updateData);
+                const response = await fetch(updateFlowUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-                // Hide loading
-                document.getElementById('loadingSubmit').style.display = 'none';
+                hideLoading('loadingSubmit');
+
+                if (!response.ok) {
+                    throw new Error(`Update failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success === false) {
+                    showError(data.message || 'Failed to update expenses', 'errorMessageSubmit');
+                    document.getElementById('submitBtn').disabled = false;
+                    return;
+                }
 
                 // Show success message
-                const successMessage = document.getElementById('successMessage');
-                successMessage.innerHTML = `
-                    <h3>✓ Actual Expenses Updated Successfully!</h3>
-                    <p>Your actual expenses have been recorded for Request ID: ${updateData.RequestID}</p>
-                    <p>You will receive a confirmation email shortly.</p>
-                `;
-                successMessage.style.display = 'block';
-
-                // Scroll to success message
-                successMessage.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('submitBtn').style.display = 'none';
 
             } catch (error) {
-                console.error('Update error:', error);
-
-                // Hide loading
-                document.getElementById('loadingSubmit').style.display = 'none';
+                hideLoading('loadingSubmit');
+                showError('Error submitting expenses: ' + error.message, 'errorMessageSubmit');
                 document.getElementById('submitBtn').disabled = false;
-
-                showError('errorMessage', 'Failed to update expenses. Please try again or contact IT support if the problem persists.');
             }
         });
-
-        // Helper function to show error messages
-        function showError(elementId, message) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-        }
     </script>
 </body>
 </html>
