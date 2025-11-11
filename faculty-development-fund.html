@@ -6,9 +6,8 @@
     <title>Faculty Professional Development Funding Request - Muskingum University</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // SharePoint Configuration - UPDATE THIS WITH YOUR SITE URL
-        const SHAREPOINT_SITE_URL = 'https://muskingum.sharepoint.com/sites/YourSiteName';
-        const DEPT_CHAIRS_LIST = 'Department Chairs';
+        // SharePoint Department Chairs List Reference:
+        // https://muskingum.sharepoint.com/sites/aa_academicaffairs-public/Lists/Department%20Chair/AllItems.aspx
         
         // Mileage rate
         const MILEAGE_RATE = 0.70;
@@ -294,12 +293,38 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="facultyEmail">Faculty Email <span class="required">*</span></label>
+                    <input type="email" id="facultyEmail" name="facultyEmail" required>
+                </div>
+
+                <div class="form-group">
                     <label for="department">Department <span class="required">*</span></label>
                     <select id="department" name="department" required>
                         <option value="">-- Select Your Department --</option>
-                        <!-- Options will be loaded from SharePoint -->
+                        <option value="Art" data-email="tgerman@muskingum.edu">Art</option>
+                        <option value="Biology" data-email="jdooley@muskingum.edu">Biology</option>
+                        <option value="Chemistry" data-email="sbarrett@muskingum.edu">Chemistry</option>
+                        <option value="Communication, Media, & Theatre" data-email="caking@muskingum.edu">Communication, Media, & Theatre</option>
+                        <option value="Computer Science" data-email="richardt@muskingum.edu">Computer Science</option>
+                        <option value="Economics, Accounting, & Business" data-email="lgeiger@muskingum.edu">Economics, Accounting, & Business</option>
+                        <option value="Education" data-email="keberly@muskingum.edu">Education</option>
+                        <option value="Education (Graduate)" data-email="keberly@muskingum.edu">Education (Graduate)</option>
+                        <option value="English" data-email="aeadams@muskingum.edu">English</option>
+                        <option value="Exercise & Health Sciences" data-email="tiffanyf@muskingum.edu">Exercise & Health Sciences</option>
+                        <option value="History" data-email="tmcgrath@muskingum.edu">History</option>
+                        <option value="Leadership (Graduate)" data-email="keberly@muskingum.edu">Leadership (Graduate)</option>
+                        <option value="Library" data-email="tmcgrath@muskingum.edu">Library</option>
+                        <option value="Mathematics" data-email="rdaquila@muskingum.edu">Mathematics</option>
+                        <option value="Music" data-email="dstrycha@muskingum.edu">Music</option>
+                        <option value="Nursing" data-email="shaeffer@muskingum.edu">Nursing</option>
+                        <option value="Occupational Therapy (Graduate)" data-email="shaeffer@muskingum.edu">Occupational Therapy (Graduate)</option>
+                        <option value="Physics & Engineering" data-email="richardt@muskingum.edu">Physics & Engineering</option>
+                        <option value="Political Science & Criminal Justice" data-email="jasonk@muskingum.edu">Political Science & Criminal Justice</option>
+                        <option value="Psychology" data-email="colleens@muskingum.edu">Psychology</option>
+                        <option value="Religion & Philosophy" data-email="rsharp@muskingum.edu">Religion & Philosophy</option>
+                        <option value="Sociology & Public Health Studies" data-email="hallieb@muskingum.edu">Sociology & Public Health Studies</option>
+                        <option value="World Languages" data-email="jmondon@muskingum.edu">World Languages</option>
                     </select>
-                    <small>Loading departments from SharePoint...</small>
                 </div>
 
                 <!-- Hidden field for chair email -->
@@ -480,119 +505,31 @@
     </div>
 
     <script>
-        // Load department chairs from SharePoint on page load
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadDepartmentChairs();
+            initializeDepartmentDropdown();
             initializeMileageCalculator();
             initializeExpenseCalculator();
             setDefaultDate();
         });
 
-        // Load department chairs from SharePoint
-        async function loadDepartmentChairs() {
-            try {
-                const apiUrl = `${SHAREPOINT_SITE_URL}/_api/web/lists/getbytitle('${DEPT_CHAIRS_LIST}')/items?$select=Department,ChairEmail&$orderby=Department`;
+        // Initialize department dropdown with chair email capture
+        function initializeDepartmentDropdown() {
+            const departmentSelect = document.getElementById('department');
+            
+            departmentSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const chairDisplay = document.getElementById('chairDisplay');
                 
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json;odata=verbose'
-                    },
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch department chairs');
+                if (selectedOption.value) {
+                    const chairEmail = selectedOption.getAttribute('data-email');
+                    document.getElementById('chairEmail').value = chairEmail;
+                    chairDisplay.classList.add('show');
+                } else {
+                    chairDisplay.classList.remove('show');
+                    document.getElementById('chairEmail').value = '';
                 }
-
-                const data = await response.json();
-                const chairs = data.d.results;
-
-                const departmentSelect = document.getElementById('department');
-                
-                // Clear loading message
-                departmentSelect.nextElementSibling.textContent = '';
-
-                // Populate dropdown
-                chairs.forEach(chair => {
-                    const option = document.createElement('option');
-                    option.value = chair.Department;
-                    option.textContent = chair.Department;
-                    option.setAttribute('data-email', chair.ChairEmail);
-                    departmentSelect.appendChild(option);
-                });
-
-                // Add change event listener
-                departmentSelect.addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    const chairDisplay = document.getElementById('chairDisplay');
-                    
-                    if (selectedOption.value) {
-                        const chairEmail = selectedOption.getAttribute('data-email');
-                        document.getElementById('chairEmail').value = chairEmail;
-                        chairDisplay.classList.add('show');
-                    } else {
-                        chairDisplay.classList.remove('show');
-                        document.getElementById('chairEmail').value = '';
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error loading department chairs:', error);
-                
-                // Fallback: Show static list of departments
-                const fallbackDepts = [
-                    {dept: "Art", email: "jdrubel@muskingum.edu"},
-                    {dept: "Biology", email: "sallen@muskingum.edu"},
-                    {dept: "Chemistry", email: "sbarrett@muskingum.edu"},
-                    {dept: "Communication, Media, & Theatre", email: "tcaudill@muskingum.edu"},
-                    {dept: "Computer Science", email: "rtaylor@muskingum.edu"},
-                    {dept: "Economics, Accounting, & Business", email: "lgeiger@muskingum.edu"},
-                    {dept: "Education", email: "keberly@muskingum.edu"},
-                    {dept: "Education (Graduate)", email: "jgrubaugh@muskingum.edu"},
-                    {dept: "English", email: "aadams@muskingum.edu"},
-                    {dept: "Exercise & Health Sciences", email: "dbennett@muskingum.edu"},
-                    {dept: "History", email: "ahattingh@muskingum.edu"},
-                    {dept: "Leadership (Graduate)", email: "rmcmanus@muskingum.edu"},
-                    {dept: "Library", email: "nhouston@muskingum.edu"},
-                    {dept: "Mathematics", email: "mdavis@muskingum.edu"},
-                    {dept: "Music", email: "dstrychacz@muskingum.edu"},
-                    {dept: "Nursing", email: "tarmstead@muskingum.edu"},
-                    {dept: "Occupational Therapy (Graduate)", email: "hcoalt@muskingum.edu"},
-                    {dept: "Physics & Engineering", email: "ysong@muskingum.edu"},
-                    {dept: "Political Science & Criminal Justice", email: "rarnold@muskingum.edu"},
-                    {dept: "Psychology", email: "dmeyer@muskingum.edu"},
-                    {dept: "Religion & Philosophy", email: "mconroy@muskingum.edu"},
-                    {dept: "Sociology & Public Health Studies", email: "hbaker@muskingum.edu"},
-                    {dept: "World Languages", email: "chernandez@muskingum.edu"}
-                ];
-
-                const departmentSelect = document.getElementById('department');
-                departmentSelect.nextElementSibling.textContent = 'Using cached department list';
-                
-                fallbackDepts.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.dept;
-                    option.textContent = item.dept;
-                    option.setAttribute('data-email', item.email);
-                    departmentSelect.appendChild(option);
-                });
-
-                // Add change event listener for fallback
-                departmentSelect.addEventListener('change', function() {
-                    const selectedOption = this.options[this.selectedIndex];
-                    const chairDisplay = document.getElementById('chairDisplay');
-                    
-                    if (selectedOption.value) {
-                        const chairEmail = selectedOption.getAttribute('data-email');
-                        document.getElementById('chairEmail').value = chairEmail;
-                        chairDisplay.classList.add('show');
-                    } else {
-                        chairDisplay.classList.remove('show');
-                        document.getElementById('chairEmail').value = '';
-                    }
-                });
-            }
+            });
         }
 
         // Initialize mileage calculator
@@ -690,6 +627,7 @@
             // Gather form data using PascalCase to match SharePoint columns
             const formData = {
                 FacultyName: document.getElementById('facultyName').value,
+                FacultyEmail: document.getElementById('facultyEmail').value,
                 Department: document.getElementById('department').value,
                 ChairEmail: chairEmail,
                 SubmissionDate: document.getElementById('submissionDate').value,
@@ -722,8 +660,8 @@
             };
             
             try {
-                // UPDATE THIS WITH YOUR POWER AUTOMATE FLOW URL
-                const flowUrl = 'YOUR_POWER_AUTOMATE_URL_HERE';
+                // Power Automate Flow URL
+                const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a149a0856a644843b2a5369bc1807d9d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=u-LWmXxDP-pzboBUTJnVDczE5ATL5Xu_-LC0_yj6pP0';
                 
                 const response = await axios.post(flowUrl, formData);
                 
