@@ -96,6 +96,17 @@
             transition: border-color 0.3s;
         }
 
+        /* Remove spinner arrows from number inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
         input:focus,
         textarea:focus,
         select:focus {
@@ -278,7 +289,11 @@
     <div class="container">
         <div class="header">
             <h1>Faculty Professional Development Funding Request</h1>
+            <p style="font-style: italic; font-weight: bold; font-size: 18px; margin-top: 10px;">Investing in your professional development.</p>
             <p>Muskingum University</p>
+            <a href="Faculty-professional-development-policy-11.7.25.docx" target="_blank" class="policy-link" style="display: inline-block; margin-top: 15px;">
+                📄 View Faculty Professional Development Policy
+            </a>
         </div>
 
         <form id="developmentFundForm">
@@ -353,9 +368,6 @@
                     <textarea id="eligibleActivities" name="eligibleActivities" 
                               placeholder="Examples: Conference attendance, workshop participation, professional membership, research activities, etc." 
                               required></textarea>
-                    <a href="Faculty-professional-development-policy-11.7.25.docx" target="_blank" class="policy-link">
-                        📄 View Faculty Professional Development Policy
-                    </a>
                 </div>
             </div>
 
@@ -646,7 +658,7 @@
                 Lodging: parseFloat(document.getElementById('lodging').value) || 0,
                 MealsIncidentals: parseFloat(document.getElementById('mealsIncidentals').value) || 0,
                 OtherExpense: parseFloat(document.getElementById('otherExpense').value) || 0,
-                OtherExpenseDesc: document.getElementById('otherExpenseDesc').value || '',
+                OtherExpenseDesc: document.getElementById('otherExpenseDesc').value.trim(),
                 TotalAnticipated: parseFloat(document.getElementById('totalAnticipated').textContent),
                 MembershipDuesActual: parseFloat(document.getElementById('membershipDuesActual').value) || 0,
                 AirTravelActual: parseFloat(document.getElementById('airTravelActual').value) || 0,
