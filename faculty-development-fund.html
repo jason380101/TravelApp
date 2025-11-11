@@ -215,6 +215,37 @@
             text-align: center;
         }
 
+        .justification-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 4px;
+        }
+
+        .justification-box label {
+            display: block;
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .justification-box textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ffc107;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .justification-box textarea:focus {
+            outline: none;
+            border-color: #ff9800;
+        }
+
         .loading {
             display: none;
             text-align: center;
@@ -291,7 +322,7 @@
             <h1>Faculty Professional Development Funding Request</h1>
             <p style="font-style: italic; font-weight: bold; font-size: 18px; margin-top: 10px;">Investing in your professional development.</p>
             <p>Muskingum University</p>
-            <a href="Faculty-professional-development-policy-11.7.25.docx" target="_blank" class="policy-link" style="display: inline-block; margin-top: 15px;">
+            <a href="https://muskingum.sharepoint.com/sites/aa_academicaffairs-public-FacultyInformation/Shared%20Documents/Faculty%20Information/Faculty%20Professional%20Development%20forms/Faculty%20professional%20development%20guide%2011.7.25.docx?d=wd84657c1bcb64b7ea2bc79a37ec36d2a&csf=1&web=1&e=W97JJm" target="_blank" class="policy-link" style="display: inline-block; margin-top: 15px;">
                 📄 View Faculty Professional Development Policy
             </a>
         </div>
@@ -316,7 +347,7 @@
                     <label for="department">Department <span class="required">*</span></label>
                     <select id="department" name="department" required>
                         <option value="">-- Select Your Department --</option>
-                        <option value="Art" data-email="tgerman@muskingum.edu">Art</option>
+                        <option value="Art and Design" data-email="tgerman@muskingum.edu">Art and Design</option>
                         <option value="Biology" data-email="jdooley@muskingum.edu">Biology</option>
                         <option value="Chemistry" data-email="sbarrett@muskingum.edu">Chemistry</option>
                         <option value="Communication, Media, & Theatre" data-email="caking@muskingum.edu">Communication, Media, & Theatre</option>
@@ -327,7 +358,6 @@
                         <option value="English" data-email="aeadams@muskingum.edu">English</option>
                         <option value="Exercise & Health Sciences" data-email="tiffanyf@muskingum.edu">Exercise & Health Sciences</option>
                         <option value="History" data-email="tmcgrath@muskingum.edu">History</option>
-                        <option value="Leadership (Graduate)" data-email="keberly@muskingum.edu">Leadership (Graduate)</option>
                         <option value="Library" data-email="tmcgrath@muskingum.edu">Library</option>
                         <option value="Mathematics" data-email="rdaquila@muskingum.edu">Mathematics</option>
                         <option value="Music" data-email="dstrycha@muskingum.edu">Music</option>
@@ -485,6 +515,16 @@
                 </table>
 
                 <div id="validationMessage" class="validation-message"></div>
+                
+                <!-- Justification comment box (appears when validation warnings are triggered) -->
+                <div id="justificationBox" class="justification-box" style="display: none;">
+                    <label for="exceededLimitJustification">
+                        <strong>Justification Required:</strong> Please explain why you are requesting an amount that exceeds the standard limits.
+                    </label>
+                    <textarea id="exceededLimitJustification" name="exceededLimitJustification" 
+                              placeholder="Provide a detailed explanation for exceeding the funding limits..."
+                              rows="4"></textarea>
+                </div>
             </div>
 
             <!-- Signature Section -->
@@ -599,13 +639,33 @@
             document.getElementById('totalAnticipated').textContent = anticipatedTotal.toFixed(2);
             document.getElementById('totalActual').textContent = actualTotal.toFixed(2);
             
-            // Validate $1000 maximum
+            // Validate $1000 maximum and $200 membership dues limit
             const validationMessage = document.getElementById('validationMessage');
+            const justificationBox = document.getElementById('justificationBox');
+            const membershipDues = parseFloat(document.getElementById('membershipDues').value) || 0;
+            const membershipDuesActual = parseFloat(document.getElementById('membershipDuesActual').value) || 0;
+            
+            let warnings = [];
+            
             if (anticipatedTotal > 1000) {
-                validationMessage.textContent = '⚠️ Warning: Anticipated total exceeds the $1,000 maximum funding limit.';
+                warnings.push('⚠️ Warning: Anticipated total exceeds the $1,000 maximum funding limit.');
+            }
+            
+            if (membershipDues > 200) {
+                warnings.push('⚠️ Warning: Membership Dues (Anticipated) exceed the $200 maximum limit.');
+            }
+            
+            if (membershipDuesActual > 200) {
+                warnings.push('⚠️ Warning: Membership Dues (Actual) exceed the $200 maximum limit.');
+            }
+            
+            if (warnings.length > 0) {
+                validationMessage.innerHTML = warnings.join('<br>');
                 validationMessage.style.display = 'block';
+                justificationBox.style.display = 'block'; // Show justification box
             } else {
                 validationMessage.style.display = 'none';
+                justificationBox.style.display = 'none'; // Hide justification box
             }
         }
 
@@ -670,7 +730,8 @@
                 MealsIncidentalsActual: parseFloat(document.getElementById('mealsIncidentalsActual').value) || 0,
                 OtherExpenseActual: parseFloat(document.getElementById('otherExpenseActual').value) || 0,
                 TotalActual: parseFloat(document.getElementById('totalActual').textContent),
-                FacultySignature: document.getElementById('facultySignature').value
+                FacultySignature: document.getElementById('facultySignature').value,
+                ExceededLimitJustification: document.getElementById('exceededLimitJustification').value || ''
             };
             
             try {
