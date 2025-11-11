@@ -452,7 +452,7 @@
             hideError('errorMessageLookup');
 
             // LOOKUP FLOW URL - This flow retrieves the request by ID
-            const lookupFlowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1';
+            const lookupFlowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=TtSKuzIlyTXlpqyZFVTRA1P7AYutz6-mX4NDXQEsL7Q';
 
             try {
                 const response = await fetch(lookupFlowUrl, {
@@ -572,7 +572,7 @@
             document.getElementById('submitBtn').disabled = true;
 
             // UPDATE FLOW URL - This flow updates the actual expenses
-            const updateFlowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1';
+            const updateFlowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/1948f00c4576426bb282d071f9d4dedc/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=lUToLKlnPnrENYZHy5rHkA6ylrOO9iY_yiQ1pHNBgZw';
 
             const payload = {
                 ID: document.getElementById('recordId').value,
