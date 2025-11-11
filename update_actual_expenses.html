@@ -477,11 +477,19 @@
 
         // Load request from SharePoint
         async function loadRequest() {
-            const requestId = document.getElementById('requestIdLookup').value.trim();
-            
-            if (!requestId) {
-                showError('errorMessageLookup', 'Please enter a Request ID.');
-                return;
+        const requestId = document.getElementById('requestIdLookup').value.trim();
+    
+        if (!requestId) {
+            showError('Please enter a Request ID', 'errorMessageLookup');
+            return;
+
+        const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8efa0266db72440fb7e910a671f6358f/triggers/manual/paths/invoke?api-version=1';  // ← PASTE HERE
+    }
+
+    showLoading('loadingLookup');
+    hideError('errorMessageLookup');
+
+    const flowUrl = 'PASTE_YOUR_ACTUAL_FLOW_URL_HERE';  // ← PASTE HERE
             }
 
             // Show loading
