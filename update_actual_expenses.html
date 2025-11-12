@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Actual Expenses - Faculty Development Fund</title>
+    <!-- Version 1.1.0 - 2025-11-11 -->
+    <!-- Changes: Added auto-fill Request ID from URL parameter -->
     <style>
         * {
             margin: 0;
@@ -429,6 +431,21 @@
 
     <script>
         const MILEAGE_RATE = 0.70;
+
+        // Auto-fill Request ID from URL parameter when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const requestId = urlParams.get('requestId');
+            
+            if (requestId) {
+                // Auto-fill the Request ID field
+                document.getElementById('requestIdLookup').value = requestId;
+                
+                // Optionally, you can automatically load the request
+                // Uncomment the line below if you want it to auto-load:
+                // loadRequest();
+            }
+        });
 
         // Show/hide loading spinner
         function showLoading(elementId) {
