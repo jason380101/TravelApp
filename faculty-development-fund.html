@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Development Fund Request - Muskingum University</title>
     <!-- Version 1.2.2 - 2025-11-11 -->
-    <!-- Changes: Updated Power Automate flow URL with proper encoding -->
+    <!-- Changes: Updated Power Automate flow URL with proper encoding, improved error handling for empty/non-JSON responses -->
     <style>
         * {
             margin: 0;
@@ -781,10 +781,21 @@
                 document.getElementById('loading').style.display = 'none';
 
                 if (!response.ok) {
-                    throw new Error('Submission failed');
+                    throw new Error(`Submission failed with status: ${response.status}`);
                 }
 
-                const data = await response.json();
+                // Try to parse JSON, but handle empty responses
+                let data = {};
+                const responseText = await response.text();
+                console.log('Response from Power Automate:', responseText);
+                
+                if (responseText) {
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.warn('Response is not JSON:', responseText);
+                    }
+                }
 
                 // Show success message
                 document.getElementById('requestIdDisplay').innerHTML = '<strong>Request ID: ' + (data.requestID || 'Pending') + '</strong>';
@@ -796,7 +807,7 @@
             } catch (error) {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
-                document.getElementById('errorMessage').textContent = 'Error submitting request. Please try again or contact support.';
+                document.getElementById('errorMessage').textContent = 'Error submitting request. Please try again or contact support. Check console for details.';
                 document.getElementById('errorMessage').style.display = 'block';
                 console.error('Error:', error);
             }
