@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Development Fund Request - Muskingum University</title>
-    <!-- Version 1.2.1 - 2025-11-11 -->
-    <!-- Changes: Removed duplicate "Art" department option, kept only "Art and Design" -->
+    <!-- Version 1.2.2 - 2025-11-11 -->
+    <!-- Changes: Updated Power Automate flow URL with proper encoding -->
     <style>
         * {
             margin: 0;
@@ -766,8 +766,8 @@
                 FacultySignature: document.getElementById('facultySignature').value
             };
 
-            // Power Automate Flow URL - REPLACE WITH YOUR ACTUAL FLOW URL
-            const flowUrl = 'YOUR_POWER_AUTOMATE_FLOW_URL_HERE';
+            // Power Automate Flow URL
+            const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a149a0856a644843b2a5369bc1807d9d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=u-LWmXxDP-pzboBUTJnVDczE5ATL5Xu_-LC0_yj6pP0';
 
             try {
                 const response = await fetch(flowUrl, {
