@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Development Fund Request - Muskingum University</title>
-    <!-- Version 1.3.0 - 2025-11-11 -->
+    <!-- Version 1.3.1 - 2025-11-11 -->
     <!-- Changes: 
-         - Updated Power Automate flow URL 
-         - Improved error handling for empty/non-JSON responses
-         - Added missing success-message CSS styling
+         v1.3.0: Updated Power Automate flow URL, improved error handling, added success-message CSS
+         v1.3.1: Fixed bug - moved success message outside form so it's visible after submission
     -->
     <style>
         * {
@@ -621,15 +620,15 @@
                 <p>Submitting your request...</p>
             </div>
 
-            <div class="success-message" id="successMessage">
-                <h3>✓ Request Submitted Successfully!</h3>
-                <p id="requestIdDisplay"></p>
-                <p>You will receive a confirmation email shortly.</p>
-                <p>Your department chair has been notified and will review your request.</p>
-            </div>
-
             <div class="error-message" id="errorMessage"></div>
         </form>
+
+        <div class="success-message" id="successMessage">
+            <h3>✓ Request Submitted Successfully!</h3>
+            <p id="requestIdDisplay"></p>
+            <p>You will receive a confirmation email shortly.</p>
+            <p>Your department chair has been notified and will review your request.</p>
+        </div>
     </div>
 
     <script>
