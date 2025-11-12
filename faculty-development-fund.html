@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Development Fund Request - Muskingum University</title>
+    <!-- Version 1.1.1 - 2025-11-11 -->
+    <!-- Changes: Fixed circular dependency causing infinite loop in validation -->
     <style>
         * {
             margin: 0;
@@ -140,6 +142,28 @@
             margin-bottom: 20px;
         }
 
+        .links-box {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #0066cc;
+            margin-bottom: 20px;
+        }
+
+        .links-box p {
+            margin-bottom: 8px;
+        }
+
+        .links-box a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .links-box a:hover {
+            text-decoration: underline;
+        }
+
         .checkbox-group {
             margin: 10px 0;
         }
@@ -210,6 +234,45 @@
             color: #DB0A5B;
             font-weight: bold;
             font-size: 14px;
+        }
+
+        .validation-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .validation-message strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .justification-box {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .justification-box label {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .justification-box textarea {
+            border: 2px solid #ffc107;
+            background-color: white;
+            min-height: 100px;
+        }
+
+        .justification-box textarea:focus {
+            border-color: #ff9800;
         }
 
         .button {
@@ -417,6 +480,12 @@
                     <strong>Note:</strong> The maximum funding approval is $1,000. Please enter your anticipated expenses below.
                 </div>
 
+                <div class="links-box">
+                    <p style="margin-bottom: 10px;"><strong>Use the US General Service Administration allowances for reimbursable expenses.</strong> Click on "Plan a Trip" to identify the amounts, which are based on destination and time of year. Note these remain in effect up to September 2026.</p>
+                    <p>📍 <strong>Domestic travel:</strong> <a href="https://www.gsa.gov/travel" target="_blank">https://www.gsa.gov/travel</a></p>
+                    <p>🌍 <strong>International travel:</strong> <a href="https://allowances.state.gov/web920/per_diem.asp" target="_blank">https://allowances.state.gov/web920/per_diem.asp</a></p>
+                </div>
+
                 <table class="expense-table">
                     <thead>
                         <tr>
@@ -426,7 +495,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Membership Dues</td>
+                            <td>Membership Dues<br><small style="color: #666;">*One per year, cap of $200</small></td>
                             <td><input type="number" step="0.01" min="0" id="membershipDues" name="membershipDues" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
@@ -469,6 +538,15 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <div id="validationMessage" class="validation-message"></div>
+
+                <div id="justificationBox" class="justification-box">
+                    <label for="exceededLimitJustification">
+                        <strong>Justification Required:</strong> Please explain why you are requesting an amount that exceeds the standard limits. Is there an additional budget(s) that is sharing the costs? Please explain.
+                    </label>
+                    <textarea id="exceededLimitJustification" name="exceededLimitJustification" placeholder="Enter your justification here..."></textarea>
+                </div>
             </div>
 
             <!-- Signature -->
@@ -517,6 +595,8 @@
 
     <script>
         const MILEAGE_RATE = 0.70;
+        const MAX_TOTAL = 1000;
+        const MAX_MEMBERSHIP_DUES = 200;
 
         // Set today's date as default
         document.getElementById('submissionDate').valueAsDate = new Date();
@@ -529,6 +609,45 @@
             document.getElementById('mileage').value = dollars.toFixed(2);
             calculateTotal();
         });
+
+        // Validate limits and show/hide justification box
+        function validateLimits(total) {
+            const membershipDues = parseFloat(document.getElementById('membershipDues').value) || 0;
+            
+            const validationMessage = document.getElementById('validationMessage');
+            const justificationBox = document.getElementById('justificationBox');
+            
+            let messages = [];
+            let showJustification = false;
+
+            // Check total limit
+            if (total > MAX_TOTAL) {
+                messages.push(`⚠️ Warning: Anticipated total exceeds the $${MAX_TOTAL.toLocaleString()} maximum funding limit.`);
+                showJustification = true;
+            }
+
+            // Check membership dues limit
+            if (membershipDues > MAX_MEMBERSHIP_DUES) {
+                messages.push(`⚠️ Warning: Membership Dues exceed the $${MAX_MEMBERSHIP_DUES} maximum limit.`);
+                showJustification = true;
+            }
+
+            // Display messages
+            if (messages.length > 0) {
+                validationMessage.innerHTML = messages.join('<br>');
+                validationMessage.style.display = 'block';
+            } else {
+                validationMessage.style.display = 'none';
+            }
+
+            // Show/hide justification box
+            if (showJustification) {
+                justificationBox.style.display = 'block';
+            } else {
+                justificationBox.style.display = 'none';
+                document.getElementById('exceededLimitJustification').value = ''; // Clear justification when hidden
+            }
+        }
 
         // Calculate total anticipated expenses
         function calculateTotal() {
@@ -545,12 +664,15 @@
             
             document.getElementById('totalAnticipated').textContent = '$' + total.toFixed(2);
 
-            // Warn if over $1000
-            if (total > 1000) {
+            // Update color based on limit
+            if (total > MAX_TOTAL) {
                 document.getElementById('totalAnticipated').style.color = '#c00';
             } else {
                 document.getElementById('totalAnticipated').style.color = '#DB0A5B';
             }
+
+            // Validate limits after calculation
+            validateLimits(total);
 
             return total;
         }
@@ -578,10 +700,15 @@
                 return;
             }
 
-            // Validate total doesn't exceed $1000
+            // Validate total doesn't exceed $1000 (with confirmation if it does)
             const total = calculateTotal();
-            if (total > 1000) {
-                if (!confirm('Your total anticipated expenses exceed $1,000. The maximum funding is $1,000. Do you want to continue?')) {
+            const membershipDues = parseFloat(document.getElementById('membershipDues').value) || 0;
+            const exceededLimitJustification = document.getElementById('exceededLimitJustification').value.trim();
+
+            if (total > MAX_TOTAL || membershipDues > MAX_MEMBERSHIP_DUES) {
+                if (!exceededLimitJustification) {
+                    alert('Please provide a justification for exceeding the standard limits.');
+                    document.getElementById('exceededLimitJustification').focus();
                     return;
                 }
             }
@@ -612,6 +739,7 @@
                 OtherExpense: parseFloat(document.getElementById('otherExpense').value) || 0,
                 OtherExpenseDesc: document.getElementById('otherExpenseDesc').value,
                 TotalAnticipated: total,
+                ExceededLimitJustification: exceededLimitJustification,
                 FacultySignature: document.getElementById('facultySignature').value
             };
 
