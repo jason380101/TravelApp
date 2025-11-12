@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Development Fund Request - Muskingum University</title>
-    <!-- Version 1.1.1 - 2025-11-11 -->
-    <!-- Changes: Fixed circular dependency causing infinite loop in validation -->
+    <!-- Version 1.2.1 - 2025-11-11 -->
+    <!-- Changes: Removed duplicate "Art" department option, kept only "Art and Design" -->
     <style>
         * {
             margin: 0;
@@ -394,7 +394,6 @@
                     </label>
                     <select id="department" name="department" required>
                         <option value="">Select Department</option>
-                        <option value="Art">Art</option>
                         <option value="Art and Design">Art and Design</option>
                         <option value="Biology">Biology</option>
                         <option value="Business">Business</option>
@@ -428,25 +427,32 @@
                 <h2 class="section-title">Professional Development Activity</h2>
 
                 <div class="form-group">
-                    <label for="eligibleActivities">
-                        Type of Activity <span class="required">*</span>
+                    <label>
+                        Eligible Activities (check all that apply) <span class="required">*</span>
                     </label>
                     <div class="checkbox-group">
                         <label>
-                            <input type="checkbox" name="activityType" value="Conference Attendance"> Conference Attendance
+                            <input type="checkbox" name="activityType" value="Attending academic or professional conferences"> Attending academic or professional conferences
                         </label>
                         <label>
-                            <input type="checkbox" name="activityType" value="Workshop/Training"> Workshop/Training
+                            <input type="checkbox" name="activityType" value="Presenting papers or serving as a panelist or session chair"> Presenting papers or serving as a panelist or session chair
                         </label>
                         <label>
-                            <input type="checkbox" name="activityType" value="Professional Membership"> Professional Membership
+                            <input type="checkbox" name="activityType" value="Participating in workshops, seminars, or training programs"> Participating in workshops, seminars, or training programs
                         </label>
                         <label>
-                            <input type="checkbox" name="activityType" value="Research Activity"> Research Activity
+                            <input type="checkbox" name="activityType" value="Enrolling in courses or certifications relevant to one's discipline or teaching"> Enrolling in courses or certifications relevant to one's discipline or teaching
                         </label>
                         <label>
-                            <input type="checkbox" name="activityType" value="Other"> Other
+                            <input type="checkbox" name="activityType" value="Travel directly related to professional development"> Travel directly related to professional development
                         </label>
+                        <label>
+                            <input type="checkbox" name="activityType" value="Membership dues (one per year, cap of $200)"> Membership dues (one per year, cap of $200)
+                        </label>
+                        <label>
+                            <input type="checkbox" name="activityType" value="Other" id="activityTypeOther"> Other (describe additional business-appropriate travel expenses):
+                        </label>
+                        <input type="text" id="otherActivityDesc" name="otherActivityDesc" placeholder="Describe other activity type" style="margin-left: 30px; margin-top: 5px; display: none;">
                     </div>
                 </div>
 
@@ -601,6 +607,17 @@
         // Set today's date as default
         document.getElementById('submissionDate').valueAsDate = new Date();
 
+        // Show/hide "Other" activity description field
+        document.getElementById('activityTypeOther').addEventListener('change', function() {
+            const otherDescField = document.getElementById('otherActivityDesc');
+            if (this.checked) {
+                otherDescField.style.display = 'block';
+            } else {
+                otherDescField.style.display = 'none';
+                otherDescField.value = ''; // Clear value when hidden
+            }
+        });
+
         // Mileage calculation
         document.getElementById('mileageMiles').addEventListener('input', function() {
             const miles = parseFloat(this.value) || 0;
@@ -685,7 +702,13 @@
         // Get selected activity types
         function getSelectedActivities() {
             const checkboxes = document.querySelectorAll('input[name="activityType"]:checked');
-            const selected = Array.from(checkboxes).map(cb => cb.value);
+            const selected = Array.from(checkboxes).map(cb => {
+                if (cb.value === 'Other') {
+                    const otherDesc = document.getElementById('otherActivityDesc').value.trim();
+                    return otherDesc ? `Other: ${otherDesc}` : 'Other';
+                }
+                return cb.value;
+            });
             return selected.join(', ');
         }
 
