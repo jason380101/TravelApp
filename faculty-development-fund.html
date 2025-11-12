@@ -3,33 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty Professional Development Funding Request - Muskingum University</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        // SharePoint Department Chairs List Reference:
-        // https://muskingum.sharepoint.com/sites/aa_academicaffairs-public/Lists/Department%20Chair/AllItems.aspx
-        
-        // Mileage rate
-        const MILEAGE_RATE = 0.70;
-    </script>
+    <title>Faculty Development Fund Request - Muskingum University</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Calibri, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Calibri, Arial, sans-serif;
             background-color: #f5f5f5;
             padding: 20px;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
-            background: white;
+            background-color: white;
             padding: 40px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -38,8 +30,8 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 3px solid #DB0A5B;
             padding-bottom: 20px;
+            border-bottom: 3px solid #DB0A5B;
         }
 
         .header h1 {
@@ -53,6 +45,26 @@
             font-size: 16px;
         }
 
+        .policy-link {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #DB0A5B;
+        }
+
+        .policy-link a {
+            color: #DB0A5B;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .policy-link a:hover {
+            text-decoration: underline;
+        }
+
         .section {
             margin-bottom: 30px;
         }
@@ -60,43 +72,47 @@
         .section-title {
             color: #DB0A5B;
             font-size: 20px;
-            font-weight: bold;
             margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #DB0A5B;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e1e1;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: #333;
-        }
-
-        .required {
-            color: #DB0A5B;
+            font-weight: bold;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="date"],
         input[type="number"],
-        textarea,
-        select {
+        select,
+        textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e1e1;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
             font-family: Calibri, sans-serif;
-            transition: border-color 0.3s;
         }
 
-        /* Remove spinner arrows from number inputs */
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #DB0A5B;
+        }
+
+        /* Hide spinner arrows on number inputs */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -107,28 +123,37 @@
             -moz-appearance: textfield;
         }
 
-        input:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: #DB0A5B;
-        }
-
         textarea {
             min-height: 100px;
             resize: vertical;
         }
 
-        .policy-link {
-            display: inline-block;
-            margin-top: 10px;
+        .required {
             color: #DB0A5B;
-            text-decoration: none;
-            font-weight: bold;
         }
 
-        .policy-link:hover {
-            text-decoration: underline;
+        .info-box {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #DB0A5B;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
         }
 
         .expense-table {
@@ -137,28 +162,28 @@
             margin-top: 15px;
         }
 
+        .expense-table th,
+        .expense-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
         .expense-table th {
             background-color: #DB0A5B;
             color: white;
-            padding: 12px;
-            text-align: left;
             font-weight: bold;
-        }
-
-        .expense-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-
-        .expense-table input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
 
         .expense-table tr:nth-child(even) {
             background-color: #f9f9f9;
+        }
+
+        .expense-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         .total-row {
@@ -167,89 +192,65 @@
         }
 
         .total-row td {
-            border-top: 2px solid #DB0A5B;
-            padding: 15px 10px;
+            font-size: 16px;
         }
 
-        .submit-button {
+        .total-value {
+            color: #DB0A5B;
+            font-size: 18px;
+        }
+
+        .mileage-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .calculated-amount {
+            color: #DB0A5B;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .button {
             background-color: #DB0A5B;
             color: white;
-            padding: 15px 40px;
+            padding: 12px 30px;
             border: none;
             border-radius: 4px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s;
-            display: block;
-            margin: 30px auto 0;
         }
 
-        .submit-button:hover {
-            background-color: #B00850;
+        .button:hover {
+            background-color: #b00848;
         }
 
-        .submit-button:disabled {
+        .button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
 
-        .validation-message {
-            color: #DB0A5B;
-            font-weight: bold;
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #ffe6f0;
-            border-radius: 4px;
-            display: none;
-        }
-
         .success-message {
-            color: #008000;
-            font-weight: bold;
-            margin-top: 10px;
-            padding: 15px;
-            background-color: #e6ffe6;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
             border-radius: 4px;
+            margin-top: 20px;
             display: none;
             text-align: center;
         }
 
-        .justification-box {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #fff3cd;
-            border: 2px solid #ffc107;
-            border-radius: 4px;
-        }
-
-        .justification-box label {
-            display: block;
-            color: #856404;
+        .success-message h3 {
             margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .justification-box textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ffc107;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: Calibri, sans-serif;
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .justification-box textarea:focus {
-            outline: none;
-            border-color: #ff9800;
         }
 
         .loading {
             display: none;
             text-align: center;
-            margin-top: 20px;
+            padding: 20px;
         }
 
         .loading-spinner {
@@ -259,7 +260,7 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
@@ -267,33 +268,11 @@
             100% { transform: rotate(360deg); }
         }
 
-        small {
-            color: #666;
-            font-size: 12px;
-        }
-
-        .chair-display {
-            display: none;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
-        .chair-display.show {
-            display: block;
-        }
-
-        .mileage-miles-input {
-            border: 2px solid #DB0A5B !important;
-        }
-
-        .calculated-amount {
-            color: #DB0A5B;
+        .error-message {
+            color: #c00;
             font-weight: bold;
-            font-size: 14px;
-            margin-top: 5px;
+            margin-top: 10px;
+            display: none;
         }
 
         @media (max-width: 768px) {
@@ -319,393 +298,306 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Faculty Professional Development Funding Request</h1>
-            <p style="font-style: italic; font-weight: bold; font-size: 18px; margin-top: 10px;">Investing in your professional development.</p>
+            <h1>Faculty Development Fund Request</h1>
             <p>Muskingum University</p>
-            <a href="https://muskingum.sharepoint.com/sites/aa_academicaffairs-public-FacultyInformation/Shared%20Documents/Faculty%20Information/Faculty%20Professional%20Development%20forms/Faculty%20professional%20development%20guide%2011.7.25.docx?d=wd84657c1bcb64b7ea2bc79a37ec36d2a&csf=1&web=1&e=W97JJm" target="_blank" class="policy-link" style="display: inline-block; margin-top: 15px;">
-                📄 View Faculty Professional Development Guide
-            </a>
         </div>
 
-        <form id="developmentFundForm">
-            
-            <!-- Faculty Information Section -->
+        <div class="policy-link">
+            <a href="Faculty professional development policy 11.7.25.docx" target="_blank">📄 Faculty Professional Development Policy</a>
+        </div>
+
+        <form id="fundingForm">
+            <!-- Faculty Information -->
             <div class="section">
                 <h2 class="section-title">Faculty Information</h2>
                 
                 <div class="form-group">
-                    <label for="facultyName">Faculty Name <span class="required">*</span></label>
+                    <label for="facultyName">
+                        Faculty Name <span class="required">*</span>
+                    </label>
                     <input type="text" id="facultyName" name="facultyName" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="facultyEmail">Faculty Email <span class="required">*</span></label>
+                    <label for="facultyEmail">
+                        Email Address <span class="required">*</span>
+                    </label>
                     <input type="email" id="facultyEmail" name="facultyEmail" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="department">Department <span class="required">*</span></label>
+                    <label for="department">
+                        Department <span class="required">*</span>
+                    </label>
                     <select id="department" name="department" required>
-                        <option value="">-- Select Your Department --</option>
-                        <option value="Art and Design" data-email="tgerman@muskingum.edu">Art and Design</option>
-                        <option value="Biology" data-email="jdooley@muskingum.edu">Biology</option>
-                        <option value="Chemistry" data-email="sbarrett@muskingum.edu">Chemistry</option>
-                        <option value="Communication, Media, & Theatre" data-email="caking@muskingum.edu">Communication, Media, & Theatre</option>
-                        <option value="Computer Science" data-email="richardt@muskingum.edu">Computer Science</option>
-                        <option value="Economics, Accounting, & Business" data-email="lgeiger@muskingum.edu">Economics, Accounting, & Business</option>
-                        <option value="Education" data-email="keberly@muskingum.edu">Education</option>
-                        <option value="Education (Graduate)" data-email="keberly@muskingum.edu">Education (Graduate)</option>
-                        <option value="English" data-email="aeadams@muskingum.edu">English</option>
-                        <option value="Exercise & Health Sciences" data-email="tiffanyf@muskingum.edu">Exercise & Health Sciences</option>
-                        <option value="History" data-email="tmcgrath@muskingum.edu">History</option>
-                        <option value="Library" data-email="tmcgrath@muskingum.edu">Library</option>
-                        <option value="Mathematics" data-email="rdaquila@muskingum.edu">Mathematics</option>
-                        <option value="Music" data-email="dstrycha@muskingum.edu">Music</option>
-                        <option value="Nursing" data-email="shaeffer@muskingum.edu">Nursing</option>
-                        <option value="Occupational Therapy (Graduate)" data-email="shaeffer@muskingum.edu">Occupational Therapy (Graduate)</option>
-                        <option value="Physics & Engineering" data-email="richardt@muskingum.edu">Physics & Engineering</option>
-                        <option value="Political Science & Criminal Justice" data-email="jasonk@muskingum.edu">Political Science & Criminal Justice</option>
-                        <option value="Psychology" data-email="colleens@muskingum.edu">Psychology</option>
-                        <option value="Religion & Philosophy" data-email="rsharp@muskingum.edu">Religion & Philosophy</option>
-                        <option value="Sociology & Public Health Studies" data-email="hallieb@muskingum.edu">Sociology & Public Health Studies</option>
-                        <option value="World Languages" data-email="jmondon@muskingum.edu">World Languages</option>
+                        <option value="">Select Department</option>
+                        <option value="Art">Art</option>
+                        <option value="Art and Design">Art and Design</option>
+                        <option value="Biology">Biology</option>
+                        <option value="Business">Business</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Education">Education</option>
+                        <option value="English">English</option>
+                        <option value="History and Political Science">History and Political Science</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Modern Languages">Modern Languages</option>
+                        <option value="Music">Music</option>
+                        <option value="Nursing">Nursing</option>
+                        <option value="Philosophy and Religion">Philosophy and Religion</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Psychology">Psychology</option>
+                        <option value="Sociology">Sociology</option>
+                        <option value="Theatre">Theatre</option>
                     </select>
                 </div>
 
-                <!-- Hidden field for chair email -->
-                <input type="hidden" id="chairEmail" name="chairEmail">
-
-                <!-- Display selected chair (hidden initially) -->
-                <div id="chairDisplay" class="chair-display">
-                    <strong>Your request will be routed to your department chair for approval.</strong>
-                </div>
-
                 <div class="form-group">
-                    <label for="submissionDate">Date of Submission <span class="required">*</span></label>
+                    <label for="submissionDate">
+                        Submission Date <span class="required">*</span>
+                    </label>
                     <input type="date" id="submissionDate" name="submissionDate" required>
                 </div>
             </div>
 
-            <!-- Policy Section -->
+            <!-- Activity Information -->
             <div class="section">
-                <h2 class="section-title">Policy Information</h2>
-                
+                <h2 class="section-title">Professional Development Activity</h2>
+
                 <div class="form-group">
                     <label for="eligibleActivities">
-                        Which of the following types of activities make you eligible for this funding? 
-                        <span class="required">*</span>
+                        Type of Activity <span class="required">*</span>
                     </label>
-                    <textarea id="eligibleActivities" name="eligibleActivities" 
-                              placeholder="Examples: Conference attendance, workshop participation, professional membership, research activities, etc." 
-                              required></textarea>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" name="activityType" value="Conference Attendance"> Conference Attendance
+                        </label>
+                        <label>
+                            <input type="checkbox" name="activityType" value="Workshop/Training"> Workshop/Training
+                        </label>
+                        <label>
+                            <input type="checkbox" name="activityType" value="Professional Membership"> Professional Membership
+                        </label>
+                        <label>
+                            <input type="checkbox" name="activityType" value="Research Activity"> Research Activity
+                        </label>
+                        <label>
+                            <input type="checkbox" name="activityType" value="Other"> Other
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Activity Details Section -->
-            <div class="section">
-                <h2 class="section-title">Activity Details</h2>
-                
                 <div class="form-group">
                     <label for="activityDescription">
-                        Provide a description of the activity you intend to pursue 
-                        <span class="required">*</span>
+                        Activity Description <span class="required">*</span>
                     </label>
-                    <textarea id="activityDescription" name="activityDescription" 
-                              placeholder="Include dates, location, name of conference/workshop, etc." 
-                              required></textarea>
+                    <textarea id="activityDescription" name="activityDescription" placeholder="Describe the professional development activity..." required></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="professionalValue">
-                        Explain how this professional development activity will enhance your work as a faculty member 
-                        <span class="required">*</span>
+                        Professional Value <span class="required">*</span>
                     </label>
-                    <textarea id="professionalValue" name="professionalValue" 
-                              placeholder="Describe the professional value and benefits to your teaching, research, or service" 
-                              required></textarea>
+                    <textarea id="professionalValue" name="professionalValue" placeholder="Explain how this activity enhances your professional development..." required></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="classArrangements">
-                        If this activity occurs during the academic year, how will your classes be covered?
+                        Class Coverage Arrangements <span class="required">*</span>
                     </label>
-                    <textarea id="classArrangements" name="classArrangements" 
-                              placeholder="Describe arrangements for class coverage (if applicable)"></textarea>
+                    <textarea id="classArrangements" name="classArrangements" placeholder="Describe how your classes will be covered during your absence..." required></textarea>
                 </div>
             </div>
 
-            <!-- Budget Section -->
+            <!-- Anticipated Expenses -->
             <div class="section">
-                <h2 class="section-title">Budget Breakdown</h2>
-                <p style="margin-bottom: 15px;">
-                    <strong>Maximum funding:</strong> $1,000 per fiscal year<br>
-                    <small>Enter anticipated costs before the activity and actual costs after completion.</small>
-                </p>
+                <h2 class="section-title">Anticipated Expenses</h2>
+                
+                <div class="info-box">
+                    <strong>Note:</strong> The maximum funding approval is $1,000. Please enter your anticipated expenses below.
+                </div>
 
                 <table class="expense-table">
                     <thead>
                         <tr>
                             <th>Expense Category</th>
-                            <th>Anticipated</th>
-                            <th>Actual</th>
+                            <th>Anticipated Expense (USD)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Membership Dues <small>(max $200)</small></td>
-                            <td><input type="number" step="0.01" min="0" max="200" id="membershipDues" name="membershipDues" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" max="200" id="membershipDuesActual" name="membershipDuesActual" value="0" class="expense-input-actual"></td>
+                            <td>Membership Dues</td>
+                            <td><input type="number" step="0.01" min="0" id="membershipDues" name="membershipDues" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
                             <td>Air Travel</td>
-                            <td><input type="number" step="0.01" min="0" id="airTravel" name="airTravel" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" id="airTravelActual" name="airTravelActual" value="0" class="expense-input-actual"></td>
+                            <td><input type="number" step="0.01" min="0" id="airTravel" name="airTravel" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
                             <td>Mileage <small>($0.70 per mile)</small></td>
                             <td>
-                                <div style="display: flex; flex-direction: column; gap: 5px;">
-                                    <input type="number" step="1" min="0" id="mileageMiles" name="mileageMiles" value="0" placeholder="Enter miles" class="mileage-miles-input">
+                                <div class="mileage-input-group">
+                                    <input type="number" step="1" min="0" id="mileageMiles" name="mileageMiles" placeholder="Enter miles" value="0">
                                     <div class="calculated-amount">= $<span id="mileageCalc">0.00</span></div>
-                                    <input type="hidden" id="mileage" name="mileage" value="0" class="expense-input-anticipated">
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display: flex; flex-direction: column; gap: 5px;">
-                                    <input type="number" step="1" min="0" id="mileageActualMiles" name="mileageActualMiles" value="0" placeholder="Enter miles" class="mileage-miles-input">
-                                    <div class="calculated-amount">= $<span id="mileageActualCalc">0.00</span></div>
-                                    <input type="hidden" id="mileageActual" name="mileageActual" value="0" class="expense-input-actual">
+                                    <input type="hidden" id="mileage" name="mileage" value="0">
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td>Other Ground Travel</td>
-                            <td><input type="number" step="0.01" min="0" id="groundTravel" name="groundTravel" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" id="groundTravelActual" name="groundTravelActual" value="0" class="expense-input-actual"></td>
+                            <td>Ground Travel</td>
+                            <td><input type="number" step="0.01" min="0" id="groundTravel" name="groundTravel" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
                             <td>Registration Costs</td>
-                            <td><input type="number" step="0.01" min="0" id="registrationCosts" name="registrationCosts" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" id="registrationCostsActual" name="registrationCostsActual" value="0" class="expense-input-actual"></td>
+                            <td><input type="number" step="0.01" min="0" id="registrationCosts" name="registrationCosts" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
                             <td>Lodging</td>
-                            <td><input type="number" step="0.01" min="0" id="lodging" name="lodging" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" id="lodgingActual" name="lodgingActual" value="0" class="expense-input-actual"></td>
+                            <td><input type="number" step="0.01" min="0" id="lodging" name="lodging" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
                             <td>Meals & Incidentals</td>
-                            <td><input type="number" step="0.01" min="0" id="mealsIncidentals" name="mealsIncidentals" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" id="mealsIncidentalsActual" name="mealsIncidentalsActual" value="0" class="expense-input-actual"></td>
+                            <td><input type="number" step="0.01" min="0" id="mealsIncidentals" name="mealsIncidentals" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr>
-                            <td>
-                                Other Expense<br>
-                                <input type="text" id="otherExpenseDesc" name="otherExpenseDesc" placeholder="Describe other expense" style="margin-top:5px; font-size:12px;">
-                            </td>
-                            <td><input type="number" step="0.01" min="0" id="otherExpense" name="otherExpense" value="0" class="expense-input-anticipated"></td>
-                            <td><input type="number" step="0.01" min="0" id="otherExpenseActual" name="otherExpenseActual" value="0" class="expense-input-actual"></td>
+                            <td>Other Expenses<br><small><input type="text" id="otherExpenseDesc" name="otherExpenseDesc" placeholder="Describe other expenses" style="margin-top: 5px;"></small></td>
+                            <td><input type="number" step="0.01" min="0" id="otherExpense" name="otherExpense" placeholder="0.00" value="0" class="expense-input"></td>
                         </tr>
                         <tr class="total-row">
-                            <td><strong>TOTAL</strong></td>
-                            <td><strong>$<span id="totalAnticipated">0.00</span></strong></td>
-                            <td><strong>$<span id="totalActual">0.00</span></strong></td>
+                            <td><strong>Total Anticipated ($1,000 maximum)</strong></td>
+                            <td><span class="total-value" id="totalAnticipated">$0.00</span></td>
                         </tr>
                     </tbody>
                 </table>
-
-                <div id="validationMessage" class="validation-message"></div>
-                
-                <!-- Justification comment box (appears when validation warnings are triggered) -->
-                <div id="justificationBox" class="justification-box" style="display: none;">
-                    <label for="exceededLimitJustification">
-                        <strong>Justification Required:</strong> Please explain why you are requesting an amount that exceeds the standard limits.
-                    </label>
-                    <textarea id="exceededLimitJustification" name="exceededLimitJustification" 
-                              placeholder="Provide a detailed explanation for exceeding the funding limits..."
-                              rows="4"></textarea>
-                </div>
             </div>
 
-            <!-- Signature Section -->
+            <!-- Signature -->
             <div class="section">
-                <h2 class="section-title">Signature</h2>
+                <h2 class="section-title">Faculty Signature</h2>
                 
                 <div class="form-group">
                     <label for="facultySignature">
-                        Faculty Member Signature (Type your full name) <span class="required">*</span>
+                        Type Your Full Name as Digital Signature <span class="required">*</span>
                     </label>
-                    <input type="text" id="facultySignature" name="facultySignature" 
-                           placeholder="Type your full name as electronic signature" required>
-                    <small>By typing your name, you certify that the information provided is accurate and complete.</small>
+                    <input type="text" id="facultySignature" name="facultySignature" placeholder="Your Full Name" required>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>By typing your name above, you certify that:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>All information provided is accurate and complete</li>
+                        <li>You will submit actual expenses within one month of activity completion</li>
+                        <li>You will provide receipts and documentation for reimbursement</li>
+                    </ul>
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="submit-button" id="submitBtn">Submit Request</button>
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="submit" class="button" id="submitBtn">
+                    Submit Request
+                </button>
+            </div>
 
-            <!-- Loading indicator -->
             <div class="loading" id="loading">
                 <div class="loading-spinner"></div>
                 <p>Submitting your request...</p>
             </div>
 
-            <!-- Success message -->
-            <div class="success-message" id="successMessage"></div>
+            <div class="success-message" id="successMessage">
+                <h3>✓ Request Submitted Successfully!</h3>
+                <p id="requestIdDisplay"></p>
+                <p>You will receive a confirmation email shortly.</p>
+                <p>Your department chair has been notified and will review your request.</p>
+            </div>
 
+            <div class="error-message" id="errorMessage"></div>
         </form>
     </div>
 
     <script>
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDepartmentDropdown();
-            initializeMileageCalculator();
-            initializeExpenseCalculator();
-            setDefaultDate();
+        const MILEAGE_RATE = 0.70;
+
+        // Set today's date as default
+        document.getElementById('submissionDate').valueAsDate = new Date();
+
+        // Mileage calculation
+        document.getElementById('mileageMiles').addEventListener('input', function() {
+            const miles = parseFloat(this.value) || 0;
+            const dollars = miles * MILEAGE_RATE;
+            document.getElementById('mileageCalc').textContent = dollars.toFixed(2);
+            document.getElementById('mileage').value = dollars.toFixed(2);
+            calculateTotal();
         });
 
-        // Initialize department dropdown with chair email capture
-        function initializeDepartmentDropdown() {
-            const departmentSelect = document.getElementById('department');
-            
-            departmentSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const chairDisplay = document.getElementById('chairDisplay');
-                
-                if (selectedOption.value) {
-                    const chairEmail = selectedOption.getAttribute('data-email');
-                    document.getElementById('chairEmail').value = chairEmail;
-                    chairDisplay.classList.add('show');
-                } else {
-                    chairDisplay.classList.remove('show');
-                    document.getElementById('chairEmail').value = '';
-                }
-            });
-        }
-
-        // Initialize mileage calculator
-        function initializeMileageCalculator() {
-            const mileageAnticipatedInput = document.getElementById('mileageMiles');
-            const mileageActualInput = document.getElementById('mileageActualMiles');
-            
-            mileageAnticipatedInput.addEventListener('input', function() {
-                const miles = parseFloat(this.value) || 0;
-                const dollars = miles * MILEAGE_RATE;
-                document.getElementById('mileageCalc').textContent = dollars.toFixed(2);
-                document.getElementById('mileage').value = dollars.toFixed(2);
-                calculateTotals();
-            });
-            
-            mileageActualInput.addEventListener('input', function() {
-                const miles = parseFloat(this.value) || 0;
-                const dollars = miles * MILEAGE_RATE;
-                document.getElementById('mileageActualCalc').textContent = dollars.toFixed(2);
-                document.getElementById('mileageActual').value = dollars.toFixed(2);
-                calculateTotals();
-            });
-        }
-
-        // Initialize expense calculator
-        function initializeExpenseCalculator() {
-            const anticipatedInputs = document.querySelectorAll('.expense-input-anticipated');
-            const actualInputs = document.querySelectorAll('.expense-input-actual');
-            
-            anticipatedInputs.forEach(input => {
-                input.addEventListener('input', calculateTotals);
-            });
-            
-            actualInputs.forEach(input => {
-                input.addEventListener('input', calculateTotals);
-            });
-        }
-
-        // Calculate totals
-        function calculateTotals() {
-            const anticipatedInputs = document.querySelectorAll('.expense-input-anticipated');
-            const actualInputs = document.querySelectorAll('.expense-input-actual');
-            
-            let anticipatedTotal = 0;
-            let actualTotal = 0;
-            
-            anticipatedInputs.forEach(input => {
-                anticipatedTotal += parseFloat(input.value) || 0;
-            });
-            
-            actualInputs.forEach(input => {
-                actualTotal += parseFloat(input.value) || 0;
-            });
-            
-            document.getElementById('totalAnticipated').textContent = anticipatedTotal.toFixed(2);
-            document.getElementById('totalActual').textContent = actualTotal.toFixed(2);
-            
-            // Validate $1000 maximum and $200 membership dues limit
-            const validationMessage = document.getElementById('validationMessage');
-            const justificationBox = document.getElementById('justificationBox');
+        // Calculate total anticipated expenses
+        function calculateTotal() {
             const membershipDues = parseFloat(document.getElementById('membershipDues').value) || 0;
-            const membershipDuesActual = parseFloat(document.getElementById('membershipDuesActual').value) || 0;
+            const airTravel = parseFloat(document.getElementById('airTravel').value) || 0;
+            const mileage = parseFloat(document.getElementById('mileage').value) || 0;
+            const groundTravel = parseFloat(document.getElementById('groundTravel').value) || 0;
+            const registrationCosts = parseFloat(document.getElementById('registrationCosts').value) || 0;
+            const lodging = parseFloat(document.getElementById('lodging').value) || 0;
+            const mealsIncidentals = parseFloat(document.getElementById('mealsIncidentals').value) || 0;
+            const otherExpense = parseFloat(document.getElementById('otherExpense').value) || 0;
+
+            const total = membershipDues + airTravel + mileage + groundTravel + registrationCosts + lodging + mealsIncidentals + otherExpense;
             
-            let warnings = [];
-            
-            if (anticipatedTotal > 1000) {
-                warnings.push('⚠️ Warning: Anticipated total exceeds the $1,000 maximum funding limit.');
-            }
-            
-            if (membershipDues > 200) {
-                warnings.push('⚠️ Warning: Membership Dues (Anticipated) exceed the $200 maximum limit.');
-            }
-            
-            if (membershipDuesActual > 200) {
-                warnings.push('⚠️ Warning: Membership Dues (Actual) exceed the $200 maximum limit.');
-            }
-            
-            if (warnings.length > 0) {
-                validationMessage.innerHTML = warnings.join('<br>');
-                validationMessage.style.display = 'block';
-                justificationBox.style.display = 'block'; // Show justification box
+            document.getElementById('totalAnticipated').textContent = '$' + total.toFixed(2);
+
+            // Warn if over $1000
+            if (total > 1000) {
+                document.getElementById('totalAnticipated').style.color = '#c00';
             } else {
-                validationMessage.style.display = 'none';
-                justificationBox.style.display = 'none'; // Hide justification box
+                document.getElementById('totalAnticipated').style.color = '#DB0A5B';
             }
+
+            return total;
         }
 
-        // Set default date to today
-        function setDefaultDate() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('submissionDate').value = today;
+        // Add event listeners to all expense inputs
+        document.querySelectorAll('.expense-input').forEach(input => {
+            input.addEventListener('input', calculateTotal);
+        });
+
+        // Get selected activity types
+        function getSelectedActivities() {
+            const checkboxes = document.querySelectorAll('input[name="activityType"]:checked');
+            const selected = Array.from(checkboxes).map(cb => cb.value);
+            return selected.join(', ');
         }
 
         // Form submission
-        document.getElementById('developmentFundForm').addEventListener('submit', async function(e) {
+        document.getElementById('fundingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            // Validate required fields
-            if (!this.checkValidity()) {
-                alert('Please fill out all required fields.');
+
+            // Validate activity type selected
+            const selectedActivities = getSelectedActivities();
+            if (!selectedActivities) {
+                alert('Please select at least one activity type.');
                 return;
             }
 
-            // Check if chair email is populated
-            const chairEmail = document.getElementById('chairEmail').value;
-            if (!chairEmail) {
-                alert('Please select a department.');
-                return;
+            // Validate total doesn't exceed $1000
+            const total = calculateTotal();
+            if (total > 1000) {
+                if (!confirm('Your total anticipated expenses exceed $1,000. The maximum funding is $1,000. Do you want to continue?')) {
+                    return;
+                }
             }
 
-            // Show loading
-            document.getElementById('submitBtn').disabled = true;
+            // Show loading, hide button
             document.getElementById('loading').style.display = 'block';
-            
-            // Gather form data using PascalCase to match SharePoint columns
-            // NOTE: SubmissionDate is NOT sent from form - Power Automate will use utcNow()
-            
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('errorMessage').style.display = 'none';
+
+            // Prepare form data
             const formData = {
                 FacultyName: document.getElementById('facultyName').value,
                 FacultyEmail: document.getElementById('facultyEmail').value,
                 Department: document.getElementById('department').value,
-                ChairEmail: chairEmail,
-                // SubmissionDate removed - will be set by Power Automate using utcNow()
-                EligibleActivities: document.getElementById('eligibleActivities').value,
+                SubmissionDate: document.getElementById('submissionDate').value,
+                EligibleActivities: selectedActivities,
                 ActivityDescription: document.getElementById('activityDescription').value,
                 ProfessionalValue: document.getElementById('professionalValue').value,
                 ClassArrangements: document.getElementById('classArrangements').value,
@@ -718,58 +610,44 @@
                 Lodging: parseFloat(document.getElementById('lodging').value) || 0,
                 MealsIncidentals: parseFloat(document.getElementById('mealsIncidentals').value) || 0,
                 OtherExpense: parseFloat(document.getElementById('otherExpense').value) || 0,
-                OtherExpenseDesc: document.getElementById('otherExpenseDesc').value.trim(),
-                TotalAnticipated: parseFloat(document.getElementById('totalAnticipated').textContent),
-                MembershipDuesActual: parseFloat(document.getElementById('membershipDuesActual').value) || 0,
-                AirTravelActual: parseFloat(document.getElementById('airTravelActual').value) || 0,
-                MileageActual: parseFloat(document.getElementById('mileageActual').value) || 0,
-                MileageActualMiles: parseFloat(document.getElementById('mileageActualMiles').value) || 0,
-                GroundTravelActual: parseFloat(document.getElementById('groundTravelActual').value) || 0,
-                RegistrationCostsActual: parseFloat(document.getElementById('registrationCostsActual').value) || 0,
-                LodgingActual: parseFloat(document.getElementById('lodgingActual').value) || 0,
-                MealsIncidentalsActual: parseFloat(document.getElementById('mealsIncidentalsActual').value) || 0,
-                OtherExpenseActual: parseFloat(document.getElementById('otherExpenseActual').value) || 0,
-                TotalActual: parseFloat(document.getElementById('totalActual').textContent),
-                FacultySignature: document.getElementById('facultySignature').value,
-                ExceededLimitJustification: document.getElementById('exceededLimitJustification').value || ''
+                OtherExpenseDesc: document.getElementById('otherExpenseDesc').value,
+                TotalAnticipated: total,
+                FacultySignature: document.getElementById('facultySignature').value
             };
-            
+
+            // Power Automate Flow URL - REPLACE WITH YOUR ACTUAL FLOW URL
+            const flowUrl = 'YOUR_POWER_AUTOMATE_FLOW_URL_HERE';
+
             try {
-                // Power Automate Flow URL
-                const flowUrl = 'https://defaultcb41821671ce4827beea96b956d0a0.04.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a149a0856a644843b2a5369bc1807d9d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=u-LWmXxDP-pzboBUTJnVDczE5ATL5Xu_-LC0_yj6pP0';
-                
-                const response = await axios.post(flowUrl, formData);
-                
-                // Hide loading
+                const response = await fetch(flowUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
                 document.getElementById('loading').style.display = 'none';
-                
+
+                if (!response.ok) {
+                    throw new Error('Submission failed');
+                }
+
+                const data = await response.json();
+
                 // Show success message
-                const successMessage = document.getElementById('successMessage');
-                successMessage.innerHTML = `
-                    <h3>✓ Request Submitted Successfully!</h3>
-                    <p>Your Faculty Development Fund request has been submitted.</p>
-                    <p>You will receive a confirmation email shortly.</p>
-                    <p>Your department chair will review your request and you'll be notified of the decision.</p>
-                `;
-                successMessage.style.display = 'block';
+                document.getElementById('requestIdDisplay').innerHTML = '<strong>Request ID: ' + (data.requestID || 'Pending') + '</strong>';
+                document.getElementById('successMessage').style.display = 'block';
                 
-                // Reset form
-                this.reset();
-                document.getElementById('chairDisplay').classList.remove('show');
-                calculateTotals();
-                setDefaultDate();
-                
-                // Scroll to success message
-                successMessage.scrollIntoView({ behavior: 'smooth' });
-                
+                // Hide form
+                document.getElementById('fundingForm').style.display = 'none';
+
             } catch (error) {
-                console.error('Submission error:', error);
-                
-                // Hide loading
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('submitBtn').disabled = false;
-                
-                alert('Failed to submit request. Please try again or contact IT support if the problem persists.');
+                document.getElementById('errorMessage').textContent = 'Error submitting request. Please try again or contact support.';
+                document.getElementById('errorMessage').style.display = 'block';
+                console.error('Error:', error);
             }
         });
     </script>
