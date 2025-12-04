@@ -4,6 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tech Support Chat - Muskingum University</title>
+  
+  <!--
+  ╔════════════════════════════════════════════════════════════════════════════╗
+  ║                  MUSKINGUM CNS TECH SUPPORT CHAT                           ║
+  ║                                                                            ║
+  ║  Version:        1.0.0                                                     ║
+  ║  Last Updated:   2024-12-04                                                ║
+  ║  Author:         Jason - Business Analyst, Muskingum University           ║
+  ║  Repository:     github.com/jason380101/Techsupportchatbot                ║
+  ║  Deploy URL:     golden-mochi-23a5e1.netlify.app                          ║
+  ║                                                                            ║
+  ║  DESCRIPTION:                                                              ║
+  ║  Interactive tech support chat widget for Muskingum University CNS        ║
+  ║  department. Routes user questions through Cloudflare Workers gateway     ║
+  ║  to n8n workflow, integrating with AI-powered chatbot backend.            ║
+  ║                                                                            ║
+  ║  ARCHITECTURE:                                                             ║
+  ║  User → HTML Chat → Cloudflare Workers Gateway → n8n → AI Chatbot         ║
+  ║                                                                            ║
+  ║  ENDPOINTS:                                                                ║
+  ║  - Chat: muskingum-chatbot-gateway.jasonn-1e6.workers.dev/techsupport    ║
+  ║  - Feedback: muskie-automation.app.n8n.cloud/webhook/chatbot-feedback    ║
+  ║                                                                            ║
+  ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║  CHANGELOG:                                                                ║
+  ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║                                                                            ║
+  ║  v1.0.0 (2024-12-04) - INITIAL PRODUCTION VERSION                         ║
+  ║    ✓ Chat interface with Muskingum branding                               ║
+  ║    ✓ Integration with Cloudflare Workers gateway                          ║
+  ║    ✓ Real-time message exchange with AI chatbot                           ║
+  ║    ✓ Thumbs up/down feedback system                                       ║
+  ║    ✓ Typing indicator for bot responses                                   ║
+  ║    ✓ Session ID tracking for conversation continuity                      ║
+  ║    ✓ Mobile responsive design                                             ║
+  ║    ✓ Error handling and user feedback                                     ║
+  ║                                                                            ║
+  ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║  FUTURE ENHANCEMENTS (Planned):                                           ║
+  ║    - File upload support for screenshots                                  ║
+  ║    - Conversation history persistence                                     ║
+  ║    - Rich text formatting in responses                                    ║
+  ║    - Voice input option                                                   ║
+  ║                                                                            ║
+  ╚════════════════════════════════════════════════════════════════════════════╝
+  -->
+  
   <style>
     * {
       margin: 0;
@@ -250,25 +297,61 @@
   </div>
 
   <script>
-    // Configuration
+    // ============================================================================
+    // VERSION INFORMATION
+    // ============================================================================
+    const APP_VERSION = {
+      version: '1.0.0',
+      buildNumber: 1,
+      lastUpdated: '2024-12-04',
+      environment: 'production',
+      author: 'Jason - Muskingum University'
+    };
+
+    // Log version information to console
+    console.log('%c🎓 Muskingum CNS Tech Support Chat', 'color: #6b2c3e; font-weight: bold; font-size: 16px;');
+    console.log('%c Version: ' + APP_VERSION.version, 'color: #8b3a4f; font-size: 12px;');
+    console.log('%c Updated: ' + APP_VERSION.lastUpdated, 'color: #666; font-size: 11px;');
+    console.log('%c Build: #' + APP_VERSION.buildNumber, 'color: #666; font-size: 11px;');
+    console.log('━'.repeat(60));
+
+    // ============================================================================
+    // CONFIGURATION
+    // ============================================================================
     const CONFIG = {
       chatEndpoint: 'https://muskingum-chatbot-gateway.jasonn-1e6.workers.dev/techsupport',
       feedbackEndpoint: 'https://muskie-automation.app.n8n.cloud/webhook/chatbot-feedback',
-      botId: 'techsupport-bot'
+      botId: 'techsupport-bot',
+      version: APP_VERSION.version // Include version in potential API calls
     };
 
-    // Generate session ID
+    // ============================================================================
+    // SESSION MANAGEMENT
+    // ============================================================================
+    // Generate unique session ID for conversation tracking
     const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + Date.now();
+    console.log('Session ID:', sessionId);
 
-    // DOM elements
+    // ============================================================================
+    // DOM ELEMENTS
+    // ============================================================================
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
 
+    // ============================================================================
+    // STATE MANAGEMENT
+    // ============================================================================
     // Track conversation IDs for feedback
     let currentConversationId = null;
 
-    // Send message function
+    // ============================================================================
+    // CORE FUNCTIONS
+    // ============================================================================
+    
+    /**
+     * Send user message to chatbot and handle response
+     */
     async function sendMessage() {
       const message = chatInput.value.trim();
       if (!message) return;
@@ -292,7 +375,8 @@
           },
           body: JSON.stringify({
             chatInput: message,
-            sessionId: sessionId
+            sessionId: sessionId,
+            version: APP_VERSION.version // Track which version sent the request
           })
         });
 
@@ -305,7 +389,7 @@
         // Remove typing indicator
         typingDiv.remove();
 
-        // Extract response text
+        // Extract response text (handle multiple response formats)
         let botResponse = '';
         if (typeof data === 'string') {
           botResponse = data;
@@ -335,7 +419,12 @@
       chatInput.focus();
     }
 
-    // Add message to chat
+    /**
+     * Add message to chat display
+     * @param {string} text - Message text content
+     * @param {string} sender - 'user' or 'bot'
+     * @param {number|null} conversationId - Optional conversation ID for feedback
+     */
     function addMessage(text, sender, conversationId = null) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${sender}`;
@@ -369,7 +458,10 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Show typing indicator
+    /**
+     * Show typing indicator while bot is "thinking"
+     * @returns {HTMLElement} The typing indicator element
+     */
     function showTypingIndicator() {
       const typingDiv = document.createElement('div');
       typingDiv.className = 'message bot';
@@ -385,7 +477,10 @@
       return typingDiv;
     }
 
-    // Show error message
+    /**
+     * Display error message to user
+     * @param {string} text - Error message text
+     */
     function showError(text) {
       const errorDiv = document.createElement('div');
       errorDiv.className = 'error-message';
@@ -397,7 +492,10 @@
       setTimeout(() => errorDiv.remove(), 5000);
     }
 
-    // Handle feedback
+    /**
+     * Handle user feedback (thumbs up/down)
+     * @param {Event} e - Click event
+     */
     async function handleFeedback(e) {
       const btn = e.currentTarget;
       const vote = parseInt(btn.dataset.vote);
@@ -420,22 +518,32 @@
           },
           body: JSON.stringify({
             conversation_id: conversationId,
-            vote: vote
+            vote: vote,
+            session_id: sessionId,
+            version: APP_VERSION.version
           })
         });
+        console.log('Feedback submitted:', vote === 1 ? 'Helpful' : 'Not helpful');
       } catch (error) {
         console.error('Feedback error:', error);
       }
     }
 
-    // Event listeners
+    // ============================================================================
+    // EVENT LISTENERS
+    // ============================================================================
     sendBtn.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
 
+    // ============================================================================
+    // INITIALIZATION
+    // ============================================================================
     // Focus input on load
     chatInput.focus();
+    
+    console.log('✓ Chat initialized and ready');
   </script>
 </body>
 </html>
