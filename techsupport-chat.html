@@ -9,7 +9,7 @@
   ╔════════════════════════════════════════════════════════════════════════════╗
   ║                  MUSKINGUM CNS TECH SUPPORT CHAT                           ║
   ║                                                                            ║
-  ║  Version:        1.1.3                                                     ║
+  ║  Version:        1.1.5                                                     ║
   ║  Last Updated:   2024-12-04                                                ║
   ║  Author:         Jason - Business Analyst, Muskingum University           ║
   ║  Repository:     github.com/jason380101/Techsupportchatbot                ║
@@ -30,6 +30,18 @@
   ║  ════════════════════════════════════════════════════════════════════════ ║
   ║  CHANGELOG:                                                                ║
   ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║                                                                            ║
+  ║  v1.1.5 (2024-12-04) - CLICKABLE LINKS FEATURE                            ║
+  ║    ✓ URLs in bot responses now automatically become clickable links       ║
+  ║    ✓ Links open in new tab with security attributes                       ║
+  ║    ✓ Supports http://, https://, and www. URLs                            ║
+  ║    ✓ Styled links to match Muskingum branding                             ║
+  ║                                                                            ║
+  ║  v1.1.4 (2024-12-04) - READABILITY FIX                                    ║
+  ║    ✓ Fixed line break rendering in bot responses                          ║
+  ║    ✓ Long text now displays with proper paragraph breaks                  ║
+  ║    ✓ Improved readability for multi-paragraph responses                   ║
+  ║    ✓ Sanitized HTML to prevent XSS while preserving formatting            ║
   ║                                                                            ║
   ║  v1.1.3 (2024-12-04) - USER FEEDBACK ENHANCEMENT                          ║
   ║    ✓ Added "Thank you" confirmation message after feedback submission     ║
@@ -148,6 +160,8 @@
       border-radius: 12px;
       font-size: 0.95rem;
       line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
     .message.user .message-content {
@@ -160,6 +174,27 @@
       background: #e9e9e9;
       color: #333;
       border-bottom-left-radius: 4px;
+    }
+
+    .chat-link {
+      color: #6b2c3e;
+      text-decoration: underline;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .chat-link:hover {
+      color: #8b3a4f;
+      text-decoration: underline;
+    }
+
+    .message.user .message-content .chat-link {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .message.user .message-content .chat-link:hover {
+      color: #f0f0f0;
     }
 
     .feedback-buttons {
@@ -368,8 +403,8 @@
     // VERSION INFORMATION
     // ============================================================================
     const APP_VERSION = {
-      version: '1.1.3',
-      buildNumber: 5,
+      version: '1.1.5',
+      buildNumber: 7,
       lastUpdated: '2024-12-04',
       environment: 'production',
       author: 'Jason - Muskingum University'
@@ -478,6 +513,47 @@
     }
 
     // ============================================================================
+    // UTILITY FUNCTIONS
+    // ============================================================================
+    
+    /**
+     * Convert URLs in text to clickable links
+     * @param {string} text - Text potentially containing URLs
+     * @returns {string} Text with URLs wrapped in anchor tags
+     */
+    function linkifyUrls(text) {
+      // Regex to match URLs (http://, https://, or www.)
+      const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/gi;
+      
+      return text.replace(urlRegex, (url) => {
+        // Add https:// to www. links
+        const href = url.startsWith('www.') ? 'https://' + url : url;
+        
+        // Create clickable link that opens in new tab with security
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="chat-link">${url}</a>`;
+      });
+    }
+
+    /**
+     * Sanitize and format text for display
+     * Escapes HTML to prevent XSS, then converts newlines to <br> tags and makes URLs clickable
+     * @param {string} text - Raw text to format
+     * @returns {string} Sanitized HTML string
+     */
+    function formatTextForDisplay(text) {
+      // Escape HTML special characters to prevent XSS
+      const div = document.createElement('div');
+      div.textContent = text;
+      const sanitized = div.innerHTML;
+      
+      // Convert newlines to <br> tags
+      const withBreaks = sanitized.replace(/\n/g, '<br>');
+      
+      // Make URLs clickable
+      return linkifyUrls(withBreaks);
+    }
+
+    // ============================================================================
     // CORE FUNCTIONS
     // ============================================================================
     
@@ -576,7 +652,10 @@
 
       const contentDiv = document.createElement('div');
       contentDiv.className = 'message-content';
-      contentDiv.textContent = text;
+      
+      // Format text with proper line breaks (sanitized to prevent XSS)
+      contentDiv.innerHTML = formatTextForDisplay(text);
+      
       messageDiv.appendChild(contentDiv);
 
       // Add feedback buttons for bot messages
