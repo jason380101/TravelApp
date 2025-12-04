@@ -9,7 +9,7 @@
   ╔════════════════════════════════════════════════════════════════════════════╗
   ║                  MUSKINGUM CNS TECH SUPPORT CHAT                           ║
   ║                                                                            ║
-  ║  Version:        1.0.0                                                     ║
+  ║  Version:        1.1.2                                                     ║
   ║  Last Updated:   2024-12-04                                                ║
   ║  Author:         Jason - Business Analyst, Muskingum University           ║
   ║  Repository:     github.com/jason380101/Techsupportchatbot                ║
@@ -31,6 +31,22 @@
   ║  CHANGELOG:                                                                ║
   ║  ════════════════════════════════════════════════════════════════════════ ║
   ║                                                                            ║
+  ║  v1.1.2 (2024-12-04) - BUG FIX                                            ║
+  ║    ✓ Fixed response parsing to handle data.message format                 ║
+  ║    ✓ Added HTML to text conversion (br tags to line breaks)               ║
+  ║    ✓ Now properly displays bot responses instead of raw JSON              ║
+  ║                                                                            ║
+  ║  v1.1.1 (2024-12-04) - UI IMPROVEMENT                                     ║
+  ║    ✓ Moved "Email CNS" button inline with feedback buttons                ║
+  ║    ✓ Better UX - escalate right where you give feedback                   ║
+  ║    ✓ Consistent button styling across feedback options                    ║
+  ║                                                                            ║
+  ║  v1.1.0 (2024-12-04) - EMAIL ESCALATION FEATURE                           ║
+  ║    ✓ Added "Email CNS" escalation button                                  ║
+  ║    ✓ Opens native email client with pre-filled information                ║
+  ║    ✓ Includes session ID and conversation context in email body           ║
+  ║    ✓ Styled to match Muskingum branding                                   ║
+  ║                                                                            ║
   ║  v1.0.0 (2024-12-04) - INITIAL PRODUCTION VERSION                         ║
   ║    ✓ Chat interface with Muskingum branding                               ║
   ║    ✓ Integration with Cloudflare Workers gateway                          ║
@@ -47,6 +63,7 @@
   ║    - Conversation history persistence                                     ║
   ║    - Rich text formatting in responses                                    ║
   ║    - Voice input option                                                   ║
+  ║    - Download conversation transcript                                     ║
   ║                                                                            ║
   ╚════════════════════════════════════════════════════════════════════════════╝
   -->
@@ -145,6 +162,7 @@
       gap: 8px;
       margin-top: 8px;
       padding-left: 5px;
+      flex-wrap: wrap;
     }
 
     .feedback-btn {
@@ -179,6 +197,31 @@
     .feedback-btn:disabled {
       cursor: not-allowed;
       opacity: 0.6;
+    }
+
+    .escalation-btn {
+      background: none;
+      border: 1px solid #6b2c3e;
+      border-radius: 20px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #6b2c3e;
+      text-decoration: none;
+    }
+
+    .escalation-btn:hover {
+      background: #6b2c3e;
+      color: white;
+    }
+
+    .escalation-btn svg {
+      width: 14px;
+      height: 14px;
     }
 
     .typing-indicator {
@@ -301,8 +344,8 @@
     // VERSION INFORMATION
     // ============================================================================
     const APP_VERSION = {
-      version: '1.0.0',
-      buildNumber: 1,
+      version: '1.1.2',
+      buildNumber: 4,
       lastUpdated: '2024-12-04',
       environment: 'production',
       author: 'Jason - Muskingum University'
@@ -322,7 +365,8 @@
       chatEndpoint: 'https://muskingum-chatbot-gateway.jasonn-1e6.workers.dev/techsupport',
       feedbackEndpoint: 'https://muskie-automation.app.n8n.cloud/webhook/chatbot-feedback',
       botId: 'techsupport-bot',
-      version: APP_VERSION.version // Include version in potential API calls
+      cnsEmail: 'cns@muskingum.edu',
+      version: APP_VERSION.version
     };
 
     // ============================================================================
@@ -344,6 +388,70 @@
     // ============================================================================
     // Track conversation IDs for feedback
     let currentConversationId = null;
+    
+    // Store conversation history for email context
+    let conversationHistory = [];
+
+    // ============================================================================
+    // ESCALATION FUNCTIONS
+    // ============================================================================
+    
+    /**
+     * Generate email escalation link with pre-filled information
+     * @returns {string} mailto: URL with pre-filled content
+     */
+    function generateEscalationEmail() {
+      const subject = 'Tech Support Request - Chat Session ' + sessionId.substr(-8);
+      
+      // Build email body with conversation context
+      let body = 'Hello CNS Team,\n\n';
+      body += 'I need additional help with my tech support request.\n\n';
+      body += '---\n';
+      body += 'CHAT SESSION INFORMATION\n';
+      body += '---\n';
+      body += 'Session ID: ' + sessionId + '\n';
+      body += 'Date: ' + new Date().toLocaleString() + '\n';
+      body += 'Chat Widget Version: ' + APP_VERSION.version + '\n\n';
+      
+      if (conversationHistory.length > 0) {
+        body += '---\n';
+        body += 'CONVERSATION HISTORY\n';
+        body += '---\n';
+        conversationHistory.forEach((msg, index) => {
+          body += (index + 1) + '. ' + msg.sender.toUpperCase() + ': ' + msg.text + '\n\n';
+        });
+      }
+      
+      body += '---\n';
+      body += 'ADDITIONAL DETAILS\n';
+      body += '---\n';
+      body += 'Please describe your issue in more detail:\n\n';
+      body += '[Type your detailed description here]\n\n';
+      body += 'Thank you!\n';
+      
+      // Encode for URL
+      const encodedSubject = encodeURIComponent(subject);
+      const encodedBody = encodeURIComponent(body);
+      
+      return `mailto:${CONFIG.cnsEmail}?subject=${encodedSubject}&body=${encodedBody}`;
+    }
+
+    /**
+     * Handle escalation button click
+     */
+    function handleEscalation(e) {
+      e.preventDefault();
+      
+      // Generate mailto link
+      const mailtoLink = generateEscalationEmail();
+      
+      // Open email client
+      window.location.href = mailtoLink;
+      
+      console.log('✉️ Escalation email opened');
+      console.log('Session:', sessionId);
+      console.log('Conversation length:', conversationHistory.length, 'messages');
+    }
 
     // ============================================================================
     // CORE FUNCTIONS
@@ -362,6 +470,10 @@
 
       // Add user message to chat
       addMessage(message, 'user');
+      
+      // Store in conversation history
+      conversationHistory.push({ sender: 'user', text: message });
+      
       chatInput.value = '';
 
       // Show typing indicator
@@ -376,7 +488,7 @@
           body: JSON.stringify({
             chatInput: message,
             sessionId: sessionId,
-            version: APP_VERSION.version // Track which version sent the request
+            version: APP_VERSION.version
           })
         });
 
@@ -393,6 +505,9 @@
         let botResponse = '';
         if (typeof data === 'string') {
           botResponse = data;
+        } else if (data.message) {
+          // Handle { message: "..." } format
+          botResponse = data.message;
         } else if (data.output) {
           botResponse = data.output;
         } else if (data.ChatResponse) {
@@ -401,11 +516,17 @@
           botResponse = JSON.stringify(data);
         }
 
+        // Convert HTML line breaks to actual line breaks
+        botResponse = botResponse.replace(/<br\s*\/?>/gi, '\n');
+
         // Get conversation ID from response if available
         currentConversationId = data.conversationId || data.conversation_id || null;
 
         // Add bot message with feedback buttons
         addMessage(botResponse, 'bot', currentConversationId);
+        
+        // Store in conversation history
+        conversationHistory.push({ sender: 'bot', text: botResponse });
 
       } catch (error) {
         typingDiv.remove();
@@ -435,23 +556,50 @@
       messageDiv.appendChild(contentDiv);
 
       // Add feedback buttons for bot messages
-      if (sender === 'bot' && conversationId) {
+      if (sender === 'bot') {
         const feedbackDiv = document.createElement('div');
         feedbackDiv.className = 'feedback-buttons';
-        feedbackDiv.innerHTML = `
-          <button class="feedback-btn" data-vote="1" data-conversation-id="${conversationId}">
-            👍 Helpful
-          </button>
-          <button class="feedback-btn" data-vote="-1" data-conversation-id="${conversationId}">
-            👎 Not Helpful
-          </button>
+        
+        // Build feedback buttons HTML
+        let feedbackHTML = '';
+        
+        // Only add voting buttons if we have a conversation ID
+        if (conversationId) {
+          feedbackHTML += `
+            <button class="feedback-btn" data-vote="1" data-conversation-id="${conversationId}">
+              👍 Helpful
+            </button>
+            <button class="feedback-btn" data-vote="-1" data-conversation-id="${conversationId}">
+              👎 Not Helpful
+            </button>
+          `;
+        }
+        
+        // Always add escalation button
+        feedbackHTML += `
+          <a href="#" class="escalation-btn" data-escalation="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Email CNS
+          </a>
         `;
+        
+        feedbackDiv.innerHTML = feedbackHTML;
         messageDiv.appendChild(feedbackDiv);
 
-        // Add click handlers
-        feedbackDiv.querySelectorAll('.feedback-btn').forEach(btn => {
-          btn.addEventListener('click', handleFeedback);
-        });
+        // Add click handlers for feedback buttons
+        if (conversationId) {
+          feedbackDiv.querySelectorAll('.feedback-btn').forEach(btn => {
+            btn.addEventListener('click', handleFeedback);
+          });
+        }
+        
+        // Add click handler for escalation button
+        const escalationBtn = feedbackDiv.querySelector('.escalation-btn');
+        if (escalationBtn) {
+          escalationBtn.addEventListener('click', handleEscalation);
+        }
       }
 
       chatMessages.appendChild(messageDiv);
@@ -501,7 +649,7 @@
       const vote = parseInt(btn.dataset.vote);
       const conversationId = parseInt(btn.dataset.conversationId);
 
-      // Disable all feedback buttons in this group
+      // Disable all feedback buttons in this group (but not escalation button)
       const feedbackDiv = btn.parentElement;
       feedbackDiv.querySelectorAll('.feedback-btn').forEach(b => {
         b.disabled = true;
@@ -544,6 +692,8 @@
     chatInput.focus();
     
     console.log('✓ Chat initialized and ready');
+    console.log('✓ Response parsing: data.message, data.output, data.ChatResponse');
+    console.log('✓ Escalation button configured inline with feedback');
   </script>
 </body>
 </html>
