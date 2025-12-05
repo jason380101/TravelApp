@@ -9,7 +9,7 @@
   ╔════════════════════════════════════════════════════════════════════════════╗
   ║                  MUSKINGUM CNS TECH SUPPORT CHAT                           ║
   ║                                                                            ║
-  ║  Version:        1.1.5                                                     ║
+  ║  Version:        1.1.7                                                     ║
   ║  Last Updated:   2024-12-04                                                ║
   ║  Author:         Jason - Business Analyst, Muskingum University           ║
   ║  Repository:     github.com/jason380101/Techsupportchatbot                ║
@@ -30,6 +30,18 @@
   ║  ════════════════════════════════════════════════════════════════════════ ║
   ║  CHANGELOG:                                                                ║
   ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║                                                                            ║
+  ║  v1.1.7 (2024-12-04) - DISPLAY FIX                                        ║
+  ║    ✓ Fixed message spacing/formatting issue                               ║
+  ║    ✓ Removed extra whitespace from welcome message                        ║
+  ║    ✓ Normalized CSS whitespace handling                                   ║
+  ║    ✓ Messages now display with proper, clean spacing                      ║
+  ║                                                                            ║
+  ║  v1.1.6 (2024-12-04) - MARKDOWN FORMATTING SUPPORT                        ║
+  ║    ✓ Bold text (**text**) now renders properly                            ║
+  ║    ✓ Italic text (*text*) now renders properly                            ║
+  ║    ✓ Improved text formatting for better readability                      ║
+  ║    ✓ No more visible asterisks in responses                               ║
   ║                                                                            ║
   ║  v1.1.5 (2024-12-04) - CLICKABLE LINKS FEATURE                            ║
   ║    ✓ URLs in bot responses now automatically become clickable links       ║
@@ -160,8 +172,16 @@
       border-radius: 12px;
       font-size: 0.95rem;
       line-height: 1.5;
-      white-space: pre-wrap;
       word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .message-content strong {
+      font-weight: 600;
+    }
+
+    .message-content em {
+      font-style: italic;
     }
 
     .message.user .message-content {
@@ -376,9 +396,7 @@
     
     <div class="chat-messages" id="chatMessages">
       <div class="message bot">
-        <div class="message-content">
-          Hello! I'm the CNS Tech Support assistant. I can help you with WiFi, email, passwords, computer labs, and other technology questions. How can I assist you today?
-        </div>
+        <div class="message-content">Hello! I'm the CNS Tech Support assistant. I can help you with WiFi, email, passwords, computer labs, and other technology questions. How can I assist you today?</div>
       </div>
     </div>
     
@@ -403,8 +421,8 @@
     // VERSION INFORMATION
     // ============================================================================
     const APP_VERSION = {
-      version: '1.1.5',
-      buildNumber: 7,
+      version: '1.1.7',
+      buildNumber: 9,
       lastUpdated: '2024-12-04',
       environment: 'production',
       author: 'Jason - Muskingum University'
@@ -517,6 +535,21 @@
     // ============================================================================
     
     /**
+     * Convert markdown formatting to HTML
+     * @param {string} text - Text with markdown formatting
+     * @returns {string} Text with HTML formatting
+     */
+    function parseMarkdown(text) {
+      // Convert **bold** to <strong>
+      text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // Convert *italic* to <em> (but not if it's part of **)
+      text = text.replace(/(?<!\*)\*([^\*]+)\*(?!\*)/g, '<em>$1</em>');
+      
+      return text;
+    }
+
+    /**
      * Convert URLs in text to clickable links
      * @param {string} text - Text potentially containing URLs
      * @returns {string} Text with URLs wrapped in anchor tags
@@ -536,21 +569,29 @@
 
     /**
      * Sanitize and format text for display
-     * Escapes HTML to prevent XSS, then converts newlines to <br> tags and makes URLs clickable
+     * Escapes HTML to prevent XSS, parses markdown, converts newlines to <br> tags and makes URLs clickable
      * @param {string} text - Raw text to format
      * @returns {string} Sanitized HTML string
      */
     function formatTextForDisplay(text) {
-      // Escape HTML special characters to prevent XSS
-      const div = document.createElement('div');
-      div.textContent = text;
-      const sanitized = div.innerHTML;
+      // Escape HTML special characters to prevent XSS (except asterisks for markdown)
+      text = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      
+      // Parse markdown formatting (after escaping HTML)
+      text = parseMarkdown(text);
       
       // Convert newlines to <br> tags
-      const withBreaks = sanitized.replace(/\n/g, '<br>');
+      text = text.replace(/\n/g, '<br>');
       
       // Make URLs clickable
-      return linkifyUrls(withBreaks);
+      text = linkifyUrls(text);
+      
+      return text;
     }
 
     // ============================================================================
