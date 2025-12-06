@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tech Support Chat - Muskingum University</title>
-  
-  <!--
+<!--
   ╔════════════════════════════════════════════════════════════════════════════╗
   ║                  MUSKINGUM CNS TECH SUPPORT CHAT                           ║
   ║                                                                            ║
-  ║  Version:        1.1.8                                                     ║
-  ║  Last Updated:   2024-12-04                                                ║
+  ║  Version:        1.1.9                                                     ║
+  ║  Last Updated:   2024-12-06                                                ║
   ║  Author:         Jason - Business Analyst, Muskingum University           ║
-  ║  Repository:     github.com/jason380101/Techsupportchatbot                ║
-  ║  Deploy URL:     golden-mochi-23a5e1.netlify.app                          ║
+  ║  Repository:     github.com/jason380101/muskingum-apps                    ║
+  ║  Deploy URL:     muskingum-apps.pages.dev                                 ║
   ║                                                                            ║
   ║  DESCRIPTION:                                                              ║
   ║  Interactive tech support chat widget for Muskingum University CNS        ║
@@ -25,11 +20,20 @@
   ║                                                                            ║
   ║  ENDPOINTS:                                                                ║
   ║  - Chat: muskingum-chatbot-gateway.jasonn-1e6.workers.dev/techsupport    ║
+  ║  - n8n: muskie-automation.app.n8n.cloud/webhook/techsupport-chat         ║
   ║  - Feedback: muskie-automation.app.n8n.cloud/webhook/chatbot-feedback    ║
   ║                                                                            ║
   ║  ════════════════════════════════════════════════════════════════════════ ║
   ║  CHANGELOG:                                                                ║
   ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║                                                                            ║
+  ║  v1.1.9 (2024-12-06) - IMPROVED ERROR HANDLING                            ║
+  ║    ✓ Added specific error messages for different HTTP status codes        ║
+  ║    ✓ Rate limit errors (429) now show actionable messages                 ║
+  ║    ✓ Global limit errors (503) direct users to email CNS                  ║
+  ║    ✓ Bot detection errors (403) inform users to use regular browser       ║
+  ║    ✓ Bad request errors (400) provide helpful feedback                    ║
+  ║    ✓ Users get clear guidance instead of generic connection errors        ║
   ║                                                                            ║
   ║  v1.1.8 (2024-12-04) - URL PARSING FIX                                    ║
   ║    ✓ Fixed trailing punctuation being included in URLs                    ║
@@ -101,7 +105,10 @@
   ║                                                                            ║
   ╚════════════════════════════════════════════════════════════════════════════╝
   -->
-  
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech Support - Muskingum University</title>
   <style>
     * {
       margin: 0;
@@ -111,22 +118,22 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f5f5;
-      height: 100vh;
+      background: linear-gradient(135deg, #6b2c3e 0%, #8b3a4f 100%);
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding: 20px;
+      color: #333;
     }
 
     .chat-container {
       width: 100%;
-      max-width: 600px;
-      height: 90vh;
-      max-height: 700px;
+      max-width: 800px;
+      height: 600px;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -137,15 +144,16 @@
       color: white;
       padding: 20px;
       text-align: center;
+      border-radius: 16px 16px 0 0;
     }
 
     .chat-header h1 {
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       margin-bottom: 5px;
     }
 
     .chat-header p {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       opacity: 0.9;
     }
 
@@ -153,32 +161,51 @@
       flex: 1;
       overflow-y: auto;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+      background: #f5f5f5;
     }
 
     .message {
+      margin-bottom: 16px;
       display: flex;
-      flex-direction: column;
-      max-width: 85%;
+      align-items: flex-start;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .message.user {
-      align-self: flex-end;
-    }
-
-    .message.bot {
-      align-self: flex-start;
+      flex-direction: row-reverse;
     }
 
     .message-content {
+      max-width: 70%;
       padding: 12px 16px;
       border-radius: 12px;
-      font-size: 0.95rem;
-      line-height: 1.5;
       word-wrap: break-word;
       overflow-wrap: break-word;
+      line-height: 1.5;
+    }
+
+    .message.bot .message-content {
+      background: white;
+      color: #333;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px 12px 12px 2px;
+    }
+
+    .message.user .message-content {
+      background: #6b2c3e;
+      color: white;
+      border-radius: 12px 12px 2px 12px;
     }
 
     .message-content strong {
@@ -189,52 +216,121 @@
       font-style: italic;
     }
 
-    .message.user .message-content {
-      background: #6b2c3e;
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-
-    .message.bot .message-content {
-      background: #e9e9e9;
-      color: #333;
-      border-bottom-left-radius: 4px;
-    }
-
-    .chat-link {
+    .message-content a {
       color: #6b2c3e;
       text-decoration: underline;
-      font-weight: 500;
-      transition: color 0.2s;
+      word-break: break-all;
     }
 
-    .chat-link:hover {
-      color: #8b3a4f;
-      text-decoration: underline;
-    }
-
-    .message.user .message-content .chat-link {
+    .message.user .message-content a {
       color: #fff;
       text-decoration: underline;
     }
 
-    .message.user .message-content .chat-link:hover {
-      color: #f0f0f0;
+    .typing-indicator {
+      display: none;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      max-width: 70px;
+      margin-bottom: 16px;
+    }
+
+    .typing-indicator span {
+      height: 8px;
+      width: 8px;
+      background: #6b2c3e;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.7;
+      }
+      30% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+    }
+
+    .chat-input-container {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    #chatInput {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 24px;
+      font-size: 1rem;
+      resize: none;
+      font-family: inherit;
+      max-height: 120px;
+      min-height: 48px;
+      overflow-y: auto;
+      transition: border-color 0.3s;
+    }
+
+    #chatInput:focus {
+      outline: none;
+      border-color: #6b2c3e;
+    }
+
+    #chatSend {
+      background: linear-gradient(135deg, #6b2c3e 0%, #8b3a4f 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-weight: 600;
+      min-width: 80px;
+    }
+
+    #chatSend:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(107, 44, 62, 0.3);
+    }
+
+    #chatSend:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .feedback-buttons {
       display: flex;
       gap: 8px;
       margin-top: 8px;
-      padding-left: 5px;
-      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeIn 0.3s ease forwards;
+      animation-delay: 0.5s;
     }
 
     .feedback-btn {
-      background: none;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      padding: 5px 12px;
+      background: #f0f0f0;
+      border: 1px solid #e0e0e0;
+      padding: 6px 12px;
+      border-radius: 16px;
       cursor: pointer;
       font-size: 0.85rem;
       transition: all 0.2s;
@@ -244,425 +340,381 @@
     }
 
     .feedback-btn:hover {
-      background: #f0f0f0;
+      background: #e0e0e0;
+      transform: scale(1.05);
     }
 
-    .feedback-btn.selected-up {
-      background: #d4edda;
-      border-color: #28a745;
-      color: #28a745;
-    }
-
-    .feedback-btn.selected-down {
-      background: #f8d7da;
-      border-color: #dc3545;
-      color: #dc3545;
-    }
-
-    .feedback-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    .escalation-btn {
-      background: none;
-      border: 1px solid #6b2c3e;
-      border-radius: 20px;
-      padding: 5px 12px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: #6b2c3e;
-      text-decoration: none;
-    }
-
-    .escalation-btn:hover {
+    .feedback-btn.selected {
       background: #6b2c3e;
       color: white;
-    }
-
-    .escalation-btn svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    .feedback-confirmation {
-      font-size: 0.8rem;
-      color: #28a745;
-      margin-top: 6px;
-      padding-left: 5px;
-      opacity: 0;
-      animation: fadeInOut 3s ease-in-out;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateY(-5px); }
-      15% { opacity: 1; transform: translateY(0); }
-      85% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-5px); }
-    }
-
-    .typing-indicator {
-      display: flex;
-      gap: 5px;
-      padding: 12px 16px;
-      background: #e9e9e9;
-      border-radius: 12px;
-      width: fit-content;
-    }
-
-    .typing-indicator span {
-      width: 8px;
-      height: 8px;
-      background: #999;
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out;
-    }
-
-    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
-    }
-
-    .chat-input-container {
-      padding: 15px 20px;
-      border-top: 1px solid #eee;
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 1px solid #ddd;
-      border-radius: 25px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .chat-input:focus {
       border-color: #6b2c3e;
     }
 
-    .send-btn {
-      background: #6b2c3e;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-
-    .send-btn:hover {
-      background: #8b3a4f;
-    }
-
-    .send-btn:disabled {
-      background: #ccc;
+    .feedback-btn:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .send-btn svg {
-      width: 20px;
-      height: 20px;
+    .email-cns-btn {
+      background: #e3f2fd;
+      border: 1px solid #2196f3;
+      color: #1976d2;
     }
 
-    .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 10px;
+    .email-cns-btn:hover {
+      background: #bbdefb;
+    }
+
+    .feedback-confirmation {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #e8f5e9;
+      border: 1px solid #4caf50;
       border-radius: 8px;
-      text-align: center;
-      margin: 10px 20px;
+      font-size: 0.85rem;
+      color: #2e7d32;
+      opacity: 0;
+      animation: fadeInOut 3s ease forwards;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .version-indicator {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-family: monospace;
+    }
+
+    @media (max-width: 768px) {
+      .chat-container {
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
+      }
+
+      .chat-header {
+        border-radius: 0;
+      }
+
+      .message-content {
+        max-width: 85%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">
-      <h1>🖥️ Tech Support Chat</h1>
-      <p>Computer & Network Services - Muskingum University</p>
+      <h1>🖥️ Tech Support</h1>
+      <p>How can we help you today?</p>
     </div>
-    
+
     <div class="chat-messages" id="chatMessages">
       <div class="message bot">
-        <div class="message-content">Hello! I'm the CNS Tech Support assistant. I can help you with WiFi, email, passwords, computer labs, and other technology questions. How can I assist you today?</div>
+        <div class="message-content">Hi! I'm your Muskingum University tech support assistant. I can help you with WiFi issues, password resets, email problems, and more. What do you need help with today?</div>
+      </div>
+      <div class="typing-indicator" id="typingIndicator">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
-    
+
     <div class="chat-input-container">
-      <input 
-        type="text" 
-        class="chat-input" 
+      <textarea 
         id="chatInput" 
-        placeholder="Type your question..." 
-        autocomplete="off"
-      >
-      <button class="send-btn" id="sendBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z"/>
-        </svg>
-      </button>
+        placeholder="Type your question here..."
+        rows="1"
+      ></textarea>
+      <button id="chatSend">Send</button>
     </div>
   </div>
 
+  <div class="version-indicator" id="versionIndicator">v1.1.9</div>
+
   <script>
-    // ============================================================================
-    // VERSION INFORMATION
-    // ============================================================================
-    const APP_VERSION = {
-      version: '1.1.8',
-      buildNumber: 10,
-      lastUpdated: '2024-12-04',
-      environment: 'production',
-      author: 'Jason - Muskingum University'
-    };
-
-    // Log version information to console
-    console.log('%c🎓 Muskingum CNS Tech Support Chat', 'color: #6b2c3e; font-weight: bold; font-size: 16px;');
-    console.log('%c Version: ' + APP_VERSION.version, 'color: #8b3a4f; font-size: 12px;');
-    console.log('%c Updated: ' + APP_VERSION.lastUpdated, 'color: #666; font-size: 11px;');
-    console.log('%c Build: #' + APP_VERSION.buildNumber, 'color: #666; font-size: 11px;');
-    console.log('━'.repeat(60));
-
-    // ============================================================================
-    // CONFIGURATION
-    // ============================================================================
+    // Configuration
     const CONFIG = {
       chatEndpoint: 'https://muskingum-chatbot-gateway.jasonn-1e6.workers.dev/techsupport',
       feedbackEndpoint: 'https://muskie-automation.app.n8n.cloud/webhook/chatbot-feedback',
-      botId: 'techsupport-bot',
       cnsEmail: 'cns@muskingum.edu',
-      version: APP_VERSION.version
+      sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
     };
 
-    // ============================================================================
-    // SESSION MANAGEMENT
-    // ============================================================================
-    // Generate unique session ID for conversation tracking
-    const sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + Date.now();
-    console.log('Session ID:', sessionId);
+    // App version
+    const APP_VERSION = {
+      version: 'v1.1.9',
+      build: 11,
+      date: '2024-12-06',
+      features: [
+        'Feedback buttons',
+        'Email CNS escalation',
+        'Markdown formatting',
+        'Clickable URLs',
+        'Conversation tracking',
+        'Thank you confirmations',
+        'Improved error handling'
+      ]
+    };
 
-    // ============================================================================
-    // DOM ELEMENTS
-    // ============================================================================
+    // DOM elements
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
-    const sendBtn = document.getElementById('sendBtn');
+    const chatSend = document.getElementById('chatSend');
+    const typingIndicator = document.getElementById('typingIndicator');
 
-    // ============================================================================
-    // STATE MANAGEMENT
-    // ============================================================================
-    // Track conversation IDs for feedback
-    let currentConversationId = null;
-    
-    // Store conversation history for email context
+    // State
+    let isWaitingForResponse = false;
     let conversationHistory = [];
+    let currentConversationId = null;
 
-    // ============================================================================
-    // ESCALATION FUNCTIONS
-    // ============================================================================
-    
-    /**
-     * Generate email escalation link with pre-filled information
-     * @returns {string} mailto: URL with pre-filled content
-     */
-    function generateEscalationEmail() {
-      const subject = 'Tech Support Request - Chat Session ' + sessionId.substr(-8);
-      
-      // Build email body with conversation context
-      let body = 'Hello CNS Team,\n\n';
-      body += 'I need additional help with my tech support request.\n\n';
-      body += '---\n';
-      body += 'CHAT SESSION INFORMATION\n';
-      body += '---\n';
-      body += 'Session ID: ' + sessionId + '\n';
-      body += 'Date: ' + new Date().toLocaleString() + '\n';
-      body += 'Chat Widget Version: ' + APP_VERSION.version + '\n\n';
-      
-      if (conversationHistory.length > 0) {
-        body += '---\n';
-        body += 'CONVERSATION HISTORY\n';
-        body += '---\n';
-        conversationHistory.forEach((msg, index) => {
-          body += (index + 1) + '. ' + msg.sender.toUpperCase() + ': ' + msg.text + '\n\n';
-        });
+    // Auto-resize textarea
+    chatInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Send on Enter (Shift+Enter for newline)
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
       }
-      
-      body += '---\n';
-      body += 'ADDITIONAL DETAILS\n';
-      body += '---\n';
-      body += 'Please describe your issue in more detail:\n\n';
-      body += '[Type your detailed description here]\n\n';
-      body += 'Thank you!\n';
-      
-      // Encode for URL
-      const encodedSubject = encodeURIComponent(subject);
-      const encodedBody = encodeURIComponent(body);
-      
-      return `mailto:${CONFIG.cnsEmail}?subject=${encodedSubject}&body=${encodedBody}`;
-    }
+    });
 
-    /**
-     * Handle escalation button click
-     */
-    function handleEscalation(e) {
-      e.preventDefault();
-      
-      // Generate mailto link
-      const mailtoLink = generateEscalationEmail();
-      
-      // Open email client
-      window.location.href = mailtoLink;
-      
-      console.log('✉️ Escalation email opened');
-      console.log('Session:', sessionId);
-      console.log('Conversation length:', conversationHistory.length, 'messages');
-    }
+    chatSend.addEventListener('click', sendMessage);
 
-    // ============================================================================
-    // UTILITY FUNCTIONS
-    // ============================================================================
-    
-    /**
-     * Convert markdown formatting to HTML
-     * @param {string} text - Text with markdown formatting
-     * @returns {string} Text with HTML formatting
-     */
+    // Parse markdown formatting
     function parseMarkdown(text) {
-      // Convert **bold** to <strong>
+      // Bold: **text**
       text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-      
-      // Convert *italic* to <em> (but not if it's part of **)
+      // Italic: *text* (but not **)
       text = text.replace(/(?<!\*)\*([^\*]+)\*(?!\*)/g, '<em>$1</em>');
-      
       return text;
     }
 
-    /**
-     * Convert URLs in text to clickable links
-     * @param {string} text - Text potentially containing URLs
-     * @returns {string} Text with URLs wrapped in anchor tags
-     */
+    // Convert URLs to clickable links
     function linkifyUrls(text) {
-      // Regex to match URLs (http://, https://, or www.)
-      const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/gi;
-      
-      return text.replace(urlRegex, (match) => {
-        // Remove trailing punctuation that's likely part of the sentence
-        const trailingPunctuation = match.match(/[.,;:!?)]+$/);
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      return text.replace(urlRegex, function(match) {
         let url = match;
         let punctuation = '';
         
+        // Check for trailing punctuation
+        const trailingPunctuation = match.match(/[.,;:!?)]+$/);
         if (trailingPunctuation) {
           punctuation = trailingPunctuation[0];
           url = match.slice(0, -punctuation.length);
         }
         
-        // Add https:// to www. links
-        const href = url.startsWith('www.') ? 'https://' + url : url;
-        
-        // Create clickable link that opens in new tab with security
-        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="chat-link">${url}</a>${punctuation}`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>${punctuation}`;
       });
     }
 
-    /**
-     * Sanitize and format text for display
-     * Escapes HTML to prevent XSS, parses markdown, converts newlines to <br> tags and makes URLs clickable
-     * @param {string} text - Raw text to format
-     * @returns {string} Sanitized HTML string
-     */
+    // Format text for display
     function formatTextForDisplay(text) {
-      // Escape HTML special characters to prevent XSS (except asterisks for markdown)
-      text = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+      // Escape HTML first
+      text = text.replace(/&/g, '&amp;')
+                 .replace(/</g, '&lt;')
+                 .replace(/>/g, '&gt;');
       
-      // Parse markdown formatting (after escaping HTML)
+      // Parse markdown
       text = parseMarkdown(text);
       
-      // Convert newlines to <br> tags
+      // Convert newlines to <br>
       text = text.replace(/\n/g, '<br>');
       
-      // Make URLs clickable
+      // Convert URLs to links
       text = linkifyUrls(text);
       
       return text;
     }
 
-    // ============================================================================
-    // CORE FUNCTIONS
-    // ============================================================================
-    
-    /**
-     * Send user message to chatbot and handle response
-     */
+    function showTyping() {
+      typingIndicator.style.display = 'block';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function hideTyping() {
+      typingIndicator.style.display = 'none';
+    }
+
+    function addMessage(text, sender, conversationId = null) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.innerHTML = formatTextForDisplay(text);
+      
+      messageDiv.appendChild(contentDiv);
+      
+      // Add feedback buttons for bot messages
+      if (sender === 'bot' && conversationId) {
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.className = 'feedback-buttons';
+        
+        const thumbsUp = document.createElement('button');
+        thumbsUp.className = 'feedback-btn';
+        thumbsUp.innerHTML = '👍 Helpful';
+        thumbsUp.onclick = () => sendFeedback(conversationId, 'positive', feedbackDiv);
+        
+        const thumbsDown = document.createElement('button');
+        thumbsDown.className = 'feedback-btn';
+        thumbsDown.innerHTML = '👎 Not helpful';
+        thumbsDown.onclick = () => sendFeedback(conversationId, 'negative', feedbackDiv);
+        
+        const emailBtn = document.createElement('button');
+        emailBtn.className = 'feedback-btn email-cns-btn';
+        emailBtn.innerHTML = '📧 Email CNS';
+        emailBtn.onclick = () => emailCNS();
+        
+        feedbackDiv.appendChild(thumbsUp);
+        feedbackDiv.appendChild(thumbsDown);
+        feedbackDiv.appendChild(emailBtn);
+        
+        messageDiv.appendChild(feedbackDiv);
+      }
+      
+      chatMessages.insertBefore(messageDiv, typingIndicator);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendFeedback(conversationId, feedbackType, feedbackDiv) {
+      try {
+        // Disable all buttons in this feedback div
+        const buttons = feedbackDiv.querySelectorAll('.feedback-btn');
+        buttons.forEach(btn => btn.disabled = true);
+        
+        // Mark selected button
+        const selectedBtn = Array.from(buttons).find(btn => 
+          btn.innerHTML.includes(feedbackType === 'positive' ? '👍' : '👎')
+        );
+        if (selectedBtn) {
+          selectedBtn.classList.add('selected');
+        }
+        
+        await fetch(CONFIG.feedbackEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            conversationId: conversationId,
+            feedback: feedbackType,
+            sessionId: CONFIG.sessionId,
+            timestamp: new Date().toISOString()
+          })
+        });
+        
+        // Show confirmation message
+        showFeedbackConfirmation(feedbackDiv);
+        
+      } catch (error) {
+        console.error('Error sending feedback:', error);
+        // Re-enable buttons on error
+        const buttons = feedbackDiv.querySelectorAll('.feedback-btn');
+        buttons.forEach(btn => btn.disabled = false);
+      }
+    }
+
+    function showFeedbackConfirmation(feedbackDiv) {
+      const confirmation = document.createElement('div');
+      confirmation.className = 'feedback-confirmation';
+      confirmation.textContent = 'Thank you for your feedback!';
+      feedbackDiv.parentNode.appendChild(confirmation);
+      
+      // Remove after animation
+      setTimeout(() => {
+        confirmation.remove();
+      }, 3000);
+    }
+
+    function emailCNS() {
+      // Build email with conversation context
+      let emailBody = 'Hello CNS Team,%0D%0A%0D%0A';
+      emailBody += 'I need additional help with my tech support issue.%0D%0A%0D%0A';
+      emailBody += '--- Conversation History ---%0D%0A%0D%0A';
+      
+      conversationHistory.forEach(msg => {
+        emailBody += `${msg.sender.toUpperCase()}: ${msg.text}%0D%0A%0D%0A`;
+      });
+      
+      emailBody += '----------------------------%0D%0A%0D%0A';
+      emailBody += 'Please let me know how you can help.%0D%0A%0D%0A';
+      emailBody += 'Thank you!';
+      
+      const mailtoLink = `mailto:${CONFIG.cnsEmail}?subject=Tech Support Request - Follow Up&body=${emailBody}`;
+      window.location.href = mailtoLink;
+    }
+
     async function sendMessage() {
       const message = chatInput.value.trim();
-      if (!message) return;
-
-      // Disable input while processing
-      chatInput.disabled = true;
-      sendBtn.disabled = true;
-
-      // Add user message to chat
-      addMessage(message, 'user');
       
-      // Store in conversation history
+      if (!message || isWaitingForResponse) {
+        return;
+      }
+
+      // Add user message
+      addMessage(message, 'user');
       conversationHistory.push({ sender: 'user', text: message });
       
       chatInput.value = '';
+      chatInput.style.height = 'auto';
 
-      // Show typing indicator
-      const typingDiv = showTypingIndicator();
+      // Disable input
+      isWaitingForResponse = true;
+      chatInput.disabled = true;
+      chatSend.disabled = true;
+
+      // Show typing
+      showTyping();
 
       try {
+        // Send to API
         const response = await fetch(CONFIG.chatEndpoint, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             chatInput: message,
-            sessionId: sessionId,
+            sessionId: CONFIG.sessionId,
             version: APP_VERSION.version
           })
         });
 
+        hideTyping();
+
+        // Handle non-OK responses (rate limits, errors)
         if (!response.ok) {
-          throw new Error('Failed to get response');
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage = errorData.message || errorData.error || 'An error occurred';
+          
+          // Create error object with status
+          const error = new Error(errorMessage);
+          error.status = response.status;
+          throw error;
         }
 
         const data = await response.json();
         
-        // Remove typing indicator
-        typingDiv.remove();
-
-        // Extract response text (handle multiple response formats)
+        // Extract response text
         let botResponse = '';
         if (typeof data === 'string') {
           botResponse = data;
         } else if (data.message) {
-          // Handle { message: "..." } format
           botResponse = data.message;
         } else if (data.output) {
           botResponse = data.output;
@@ -672,234 +724,53 @@
           botResponse = JSON.stringify(data);
         }
 
-        // Convert HTML line breaks to actual line breaks
+        // Convert HTML br tags to newlines
         botResponse = botResponse.replace(/<br\s*\/?>/gi, '\n');
 
-        // Get conversation ID from response if available
+        // Get conversation ID
         currentConversationId = data.conversationId || data.conversation_id || null;
 
-        // Add bot message with feedback buttons
+        // Add bot message
         addMessage(botResponse, 'bot', currentConversationId);
-        
-        // Store in conversation history
         conversationHistory.push({ sender: 'bot', text: botResponse });
 
-} catch (error) {
-  console.error('Error sending message:', error);
-  hideTyping();
-  
-  // Check if it's a rate limit or HTTP error
-  if (error.status === 429) {
-    // Rate limit exceeded
-    addMessage(error.message || 'You\'ve reached the rate limit. Please wait a moment and try again.', 'bot');
-  } else if (error.status === 503) {
-    // Service unavailable (global limit)
-    addMessage(error.message || 'The service is experiencing high traffic. Please try again in a few minutes or email cns@muskingum.edu.', 'bot');
-  } else if (error.status === 403) {
-    // Bot detected
-    addMessage(error.message || 'Please use a regular web browser to access this service.', 'bot');
-  } else {
-    // Generic error
-    addMessage('Sorry, I\'m having trouble connecting. Please try again or email cns@muskingum.edu.', 'bot');
-  }
-}
-      // Re-enable input
-      chatInput.disabled = false;
-      sendBtn.disabled = false;
-      chatInput.focus();
-    }
-
-    /**
-     * Add message to chat display
-     * @param {string} text - Message text content
-     * @param {string} sender - 'user' or 'bot'
-     * @param {number|null} conversationId - Optional conversation ID for feedback
-     */
-    function addMessage(text, sender, conversationId = null) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `message ${sender}`;
-
-      const contentDiv = document.createElement('div');
-      contentDiv.className = 'message-content';
-      
-      // Format text with proper line breaks (sanitized to prevent XSS)
-      contentDiv.innerHTML = formatTextForDisplay(text);
-      
-      messageDiv.appendChild(contentDiv);
-
-      // Add feedback buttons for bot messages
-      if (sender === 'bot') {
-        const feedbackDiv = document.createElement('div');
-        feedbackDiv.className = 'feedback-buttons';
-        
-        // Build feedback buttons HTML
-        let feedbackHTML = '';
-        
-        // Only add voting buttons if we have a conversation ID
-        if (conversationId) {
-          feedbackHTML += `
-            <button class="feedback-btn" data-vote="1" data-conversation-id="${conversationId}">
-              👍 Helpful
-            </button>
-            <button class="feedback-btn" data-vote="-1" data-conversation-id="${conversationId}">
-              👎 Not Helpful
-            </button>
-          `;
-        }
-        
-        // Always add escalation button
-        feedbackHTML += `
-          <a href="#" class="escalation-btn" data-escalation="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
-            Email CNS
-          </a>
-        `;
-        
-        feedbackDiv.innerHTML = feedbackHTML;
-        messageDiv.appendChild(feedbackDiv);
-
-        // Add click handlers for feedback buttons
-        if (conversationId) {
-          feedbackDiv.querySelectorAll('.feedback-btn').forEach(btn => {
-            btn.addEventListener('click', handleFeedback);
-          });
-        }
-        
-        // Add click handler for escalation button
-        const escalationBtn = feedbackDiv.querySelector('.escalation-btn');
-        if (escalationBtn) {
-          escalationBtn.addEventListener('click', handleEscalation);
-        }
-      }
-
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    /**
-     * Show typing indicator while bot is "thinking"
-     * @returns {HTMLElement} The typing indicator element
-     */
-    function showTypingIndicator() {
-      const typingDiv = document.createElement('div');
-      typingDiv.className = 'message bot';
-      typingDiv.innerHTML = `
-        <div class="typing-indicator">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      `;
-      chatMessages.appendChild(typingDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return typingDiv;
-    }
-
-    /**
-     * Display error message to user
-     * @param {string} text - Error message text
-     */
-    function showError(text) {
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message';
-      errorDiv.textContent = text;
-      chatMessages.appendChild(errorDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      
-      // Remove after 5 seconds
-      setTimeout(() => errorDiv.remove(), 5000);
-    }
-
-    /**
-     * Handle user feedback (thumbs up/down)
-     * @param {Event} e - Click event
-     */
-    async function handleFeedback(e) {
-      const btn = e.currentTarget;
-      const vote = parseInt(btn.dataset.vote);
-      const conversationId = parseInt(btn.dataset.conversationId);
-
-      // Disable all feedback buttons in this group (but not escalation button)
-      const feedbackDiv = btn.parentElement;
-      feedbackDiv.querySelectorAll('.feedback-btn').forEach(b => {
-        b.disabled = true;
-      });
-
-      // Highlight selected button
-      btn.classList.add(vote === 1 ? 'selected-up' : 'selected-down');
-
-      // Show thank you message
-      showFeedbackConfirmation(feedbackDiv, vote);
-
-      try {
-        await fetch(CONFIG.feedbackEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            conversation_id: conversationId,
-            vote: vote,
-            session_id: sessionId,
-            version: APP_VERSION.version
-          })
-        });
-        console.log('Feedback submitted:', vote === 1 ? 'Helpful' : 'Not helpful');
       } catch (error) {
-        console.error('Feedback error:', error);
+        console.error('Error sending message:', error);
+        hideTyping();
+        
+        // Display appropriate error message based on status code
+        let errorMessage;
+        
+        if (error.status === 429) {
+          // Rate limit exceeded
+          errorMessage = error.message || 'You\'ve reached the rate limit. Please wait a moment and try again.';
+        } else if (error.status === 503) {
+          // Service unavailable (global limit)
+          errorMessage = error.message || 'The service is experiencing high traffic. Please try again in a few minutes or email cns@muskingum.edu for immediate assistance.';
+        } else if (error.status === 403) {
+          // Bot detected or forbidden
+          errorMessage = error.message || 'Access denied. Please use a regular web browser to access this service.';
+        } else if (error.status === 400) {
+          // Bad request (validation error)
+          errorMessage = error.message || 'Invalid request. Please check your input and try again.';
+        } else {
+          // Generic error
+          errorMessage = 'Sorry, I\'m having trouble connecting. Please try again or email cns@muskingum.edu for help.';
+        }
+        
+        addMessage(errorMessage, 'bot');
+        
+      } finally {
+        // Re-enable input
+        isWaitingForResponse = false;
+        chatInput.disabled = false;
+        chatSend.disabled = false;
+        chatInput.focus();
       }
     }
 
-    /**
-     * Show feedback confirmation message
-     * @param {HTMLElement} feedbackDiv - The feedback buttons container
-     * @param {number} vote - The vote value (1 or -1)
-     */
-    function showFeedbackConfirmation(feedbackDiv, vote) {
-      // Check if confirmation already exists
-      const existingConfirmation = feedbackDiv.parentElement.querySelector('.feedback-confirmation');
-      if (existingConfirmation) {
-        existingConfirmation.remove();
-      }
-
-      // Create confirmation message
-      const confirmationDiv = document.createElement('div');
-      confirmationDiv.className = 'feedback-confirmation';
-      
-      const message = vote === 1 
-        ? '✓ Thank you for your feedback! We\'re glad we could help.' 
-        : '✓ Thank you for your feedback. We\'ll work to improve our responses.';
-      
-      confirmationDiv.textContent = message;
-
-      // Insert after feedback buttons
-      feedbackDiv.parentElement.appendChild(confirmationDiv);
-
-      // Remove after animation completes (3 seconds)
-      setTimeout(() => {
-        confirmationDiv.remove();
-      }, 3000);
-    }
-
-    // ============================================================================
-    // EVENT LISTENERS
-    // ============================================================================
-    sendBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    // ============================================================================
-    // INITIALIZATION
-    // ============================================================================
-    // Focus input on load
-    chatInput.focus();
-    
-    console.log('✓ Chat initialized and ready');
-    console.log('✓ Response parsing: data.message, data.output, data.ChatResponse');
-    console.log('✓ Escalation button configured inline with feedback');
+    // Log version on load
+    console.log('Tech Support Chat loaded:', APP_VERSION);
   </script>
 </body>
 </html>
