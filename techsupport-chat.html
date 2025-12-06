@@ -684,12 +684,25 @@
         // Store in conversation history
         conversationHistory.push({ sender: 'bot', text: botResponse });
 
-      } catch (error) {
-        typingDiv.remove();
-        showError('Sorry, there was an error processing your request. Please try again.');
-        console.error('Chat error:', error);
-      }
-
+} catch (error) {
+  console.error('Error sending message:', error);
+  hideTyping();
+  
+  // Check if it's a rate limit or HTTP error
+  if (error.status === 429) {
+    // Rate limit exceeded
+    addMessage(error.message || 'You\'ve reached the rate limit. Please wait a moment and try again.', 'bot');
+  } else if (error.status === 503) {
+    // Service unavailable (global limit)
+    addMessage(error.message || 'The service is experiencing high traffic. Please try again in a few minutes or email cns@muskingum.edu.', 'bot');
+  } else if (error.status === 403) {
+    // Bot detected
+    addMessage(error.message || 'Please use a regular web browser to access this service.', 'bot');
+  } else {
+    // Generic error
+    addMessage('Sorry, I\'m having trouble connecting. Please try again or email cns@muskingum.edu.', 'bot');
+  }
+}
       // Re-enable input
       chatInput.disabled = false;
       sendBtn.disabled = false;
