@@ -4,7 +4,7 @@
   ╔════════════════════════════════════════════════════════════════════════════╗
   ║                  MUSKINGUM CNS TECH SUPPORT CHAT                           ║
   ║                                                                            ║
-  ║  Version:        1.1.9                                                     ║
+  ║  Version:        1.2.0                                                     ║
   ║  Last Updated:   2024-12-06                                                ║
   ║  Author:         Jason - Business Analyst, Muskingum University           ║
   ║  Repository:     github.com/jason380101/muskingum-apps                    ║
@@ -26,6 +26,14 @@
   ║  ════════════════════════════════════════════════════════════════════════ ║
   ║  CHANGELOG:                                                                ║
   ║  ════════════════════════════════════════════════════════════════════════ ║
+  ║                                                                            ║
+  ║  v1.2.0 (2024-12-06) - UI IMPROVEMENTS                                    ║
+  ║    ✓ Repositioned feedback buttons underneath bot messages                ║
+  ║    ✓ Changed feedback layout from vertical to horizontal                  ║
+  ║    ✓ Added iPhone-style three-dot typing indicator                        ║
+  ║    ✓ Typing indicator appears under user's last question                  ║
+  ║    ✓ Animated bouncing dots while waiting for response                    ║
+  ║    ✓ Improved visual consistency with modern messaging apps               ║
   ║                                                                            ║
   ║  v1.1.9 (2024-12-06) - IMPROVED ERROR HANDLING                            ║
   ║    ✓ Added specific error messages for different HTTP status codes        ║
@@ -167,7 +175,7 @@
     .message {
       margin-bottom: 16px;
       display: flex;
-      align-items: flex-start;
+      flex-direction: column;
       animation: fadeIn 0.3s ease;
     }
 
@@ -183,7 +191,11 @@
     }
 
     .message.user {
-      flex-direction: row-reverse;
+      align-items: flex-end;
+    }
+
+    .message.bot {
+      align-items: flex-start;
     }
 
     .message-content {
@@ -227,41 +239,49 @@
       text-decoration: underline;
     }
 
+    /* iPhone-style typing indicator */
     .typing-indicator {
       display: none;
+      align-self: flex-start;
+      background: #e0e0e0;
       padding: 12px 16px;
-      background: white;
-      border-radius: 12px;
-      border: 1px solid #e0e0e0;
-      max-width: 70px;
+      border-radius: 18px;
       margin-bottom: 16px;
+      max-width: 70px;
     }
 
-    .typing-indicator span {
-      height: 8px;
+    .typing-indicator.show {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
       width: 8px;
-      background: #6b2c3e;
+      height: 8px;
+      background: #999;
       border-radius: 50%;
-      display: inline-block;
-      margin-right: 4px;
-      animation: typing 1.4s infinite;
+      animation: typingBounce 1.4s infinite ease-in-out;
     }
 
-    .typing-indicator span:nth-child(2) {
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
       animation-delay: 0.2s;
     }
 
-    .typing-indicator span:nth-child(3) {
+    .typing-dot:nth-child(3) {
       animation-delay: 0.4s;
     }
 
-    @keyframes typing {
+    @keyframes typingBounce {
       0%, 60%, 100% {
         transform: translateY(0);
         opacity: 0.7;
       }
       30% {
-        transform: translateY(-10px);
+        transform: translateY(-8px);
         opacity: 1;
       }
     }
@@ -317,6 +337,7 @@
       cursor: not-allowed;
     }
 
+    /* Feedback buttons - horizontal layout underneath message */
     .feedback-buttons {
       display: flex;
       gap: 8px;
@@ -324,6 +345,7 @@
       opacity: 0;
       animation: fadeIn 0.3s ease forwards;
       animation-delay: 0.5s;
+      align-self: flex-start;
     }
 
     .feedback-btn {
@@ -375,6 +397,7 @@
       color: #2e7d32;
       opacity: 0;
       animation: fadeInOut 3s ease forwards;
+      align-self: flex-start;
     }
 
     @keyframes fadeInOut {
@@ -425,9 +448,9 @@
         <div class="message-content">Hi! I'm your Muskingum University tech support assistant. I can help you with WiFi issues, password resets, email problems, and more. What do you need help with today?</div>
       </div>
       <div class="typing-indicator" id="typingIndicator">
-        <span></span>
-        <span></span>
-        <span></span>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
       </div>
     </div>
 
@@ -441,7 +464,7 @@
     </div>
   </div>
 
-  <div class="version-indicator" id="versionIndicator">v1.1.9</div>
+  <div class="version-indicator" id="versionIndicator">v1.2.0</div>
 
   <script>
     // Configuration
@@ -454,8 +477,8 @@
 
     // App version
     const APP_VERSION = {
-      version: 'v1.1.9',
-      build: 11,
+      version: 'v1.2.0',
+      build: 12,
       date: '2024-12-06',
       features: [
         'Feedback buttons',
@@ -464,7 +487,8 @@
         'Clickable URLs',
         'Conversation tracking',
         'Thank you confirmations',
-        'Improved error handling'
+        'Improved error handling',
+        'iPhone-style typing indicator'
       ]
     };
 
@@ -542,12 +566,12 @@
     }
 
     function showTyping() {
-      typingIndicator.style.display = 'block';
+      typingIndicator.classList.add('show');
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     function hideTyping() {
-      typingIndicator.style.display = 'none';
+      typingIndicator.classList.remove('show');
     }
 
     function addMessage(text, sender, conversationId = null) {
@@ -560,7 +584,7 @@
       
       messageDiv.appendChild(contentDiv);
       
-      // Add feedback buttons for bot messages
+      // Add feedback buttons for bot messages (underneath the message)
       if (sender === 'bot' && conversationId) {
         const feedbackDiv = document.createElement('div');
         feedbackDiv.className = 'feedback-buttons';
@@ -678,7 +702,7 @@
       chatInput.disabled = true;
       chatSend.disabled = true;
 
-      // Show typing
+      // Show typing indicator
       showTyping();
 
       try {
