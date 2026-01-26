@@ -181,6 +181,7 @@
         
         <div id="tripInfo" class="trip-info" style="display: none;">
             <h3>Travel Information</h3>
+            <p><strong>Trip Name:</strong> <span id="tripNameDisplay"></span></p>
             <p><strong>Destination:</strong> <span id="tripDestination"></span></p>
             <p><strong>Faculty Organizer:</strong> <span id="facultyName"></span></p>
             <p><strong>Dates:</strong> <span id="tripDates"></span></p>
@@ -280,6 +281,7 @@
                 trackingCode: params.get('tracking'),
                 email: params.get('email'),
                 tripName: params.get('tripName'),
+                destination: params.get('destination'),
                 dates: params.get('dates'),
                 facultyName: params.get('facultyName'),
                 studentName: params.get('studentName'),
@@ -318,7 +320,8 @@
                 };
 
                 // Display trip information from URL parameters
-                document.getElementById('tripDestination').textContent = params.tripName || 'See email for details';
+                document.getElementById('tripNameDisplay').textContent = params.tripName || 'See email for details';
+                document.getElementById('tripDestination').textContent = params.destination || 'See email for details';
                 document.getElementById('facultyName').textContent = params.facultyName || 'See email for details';
                 document.getElementById('tripDates').textContent = params.dates || 'See email for details';
                 document.getElementById('purposeOfTravel').textContent = params.purposeOfTravel || 'See email for details';
