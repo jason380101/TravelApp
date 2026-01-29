@@ -246,6 +246,13 @@
             display: none;
         }
 
+        .amount-error {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
         .validation-message strong {
             display: block;
             margin-bottom: 5px;
@@ -596,13 +603,16 @@
                     </tbody>
                 </table>
 
+                <div id="amountError" class="amount-error">Enter an amount no greater than $1,000.00</div>
+
                 <div id="validationMessage" class="validation-message"></div>
 
                 <div id="justificationBox" class="justification-box">
                     <label for="exceededLimitJustification">
-                        <strong>Justification Required:</strong> Please explain why you are requesting an amount that exceeds the standard limits. Is there an additional budget(s) that is sharing the costs? Please explain.
+                        <strong>Justification Required:</strong> Please explain why you are requesting membership dues that exceed the $200 limit.
                     </label>
                     <textarea id="exceededLimitJustification" name="exceededLimitJustification" placeholder="Enter your justification here..."></textarea>
+                    <p style="margin-top: 10px; font-size: 14px;"><strong>Note:</strong> Receipts must be turned into the Provost office to receive reimbursement.</p>
                 </div>
             </div>
 
@@ -684,17 +694,22 @@
         // Validate limits and show/hide justification box
         function validateLimits(total) {
             const membershipDues = parseFloat(document.getElementById('membershipDues').value) || 0;
-            
+
             const validationMessage = document.getElementById('validationMessage');
             const justificationBox = document.getElementById('justificationBox');
-            
+            const amountError = document.getElementById('amountError');
+            const submitBtn = document.getElementById('submitBtn');
+
             let messages = [];
             let showJustification = false;
 
-            // Check total limit
+            // Check total limit - block submission if exceeded
             if (total > MAX_TOTAL) {
-                messages.push(`⚠️ Warning: Anticipated total exceeds the $${MAX_TOTAL.toLocaleString()} maximum funding limit.`);
-                showJustification = true;
+                amountError.style.display = 'block';
+                submitBtn.disabled = true;
+            } else {
+                amountError.style.display = 'none';
+                submitBtn.disabled = false;
             }
 
             // Check membership dues limit
@@ -711,7 +726,7 @@
                 validationMessage.style.display = 'none';
             }
 
-            // Show/hide justification box
+            // Show/hide justification box (only for membership dues now)
             if (showJustification) {
                 justificationBox.style.display = 'block';
             } else {
@@ -777,14 +792,21 @@
                 return;
             }
 
-            // Validate total doesn't exceed $1000 (with confirmation if it does)
+            // Validate total doesn't exceed $1000
             const total = calculateTotal();
             const membershipDues = parseFloat(document.getElementById('membershipDues').value) || 0;
             const exceededLimitJustification = document.getElementById('exceededLimitJustification').value.trim();
 
-            if (total > MAX_TOTAL || membershipDues > MAX_MEMBERSHIP_DUES) {
+            // Block submission if total exceeds $1000
+            if (total > MAX_TOTAL) {
+                alert('Enter an amount no greater than $1,000.00');
+                return;
+            }
+
+            // Require justification only for membership dues exceeding limit
+            if (membershipDues > MAX_MEMBERSHIP_DUES) {
                 if (!exceededLimitJustification) {
-                    alert('Please provide a justification for exceeding the standard limits.');
+                    alert('Please provide a justification for exceeding the membership dues limit.');
                     document.getElementById('exceededLimitJustification').focus();
                     return;
                 }
